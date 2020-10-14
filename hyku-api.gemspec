@@ -7,7 +7,7 @@ require "hyku/api/version"
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
   spec.name        = "hyku-api"
-  spec.version     = Hyku::Api::VERSION
+  spec.version     = Hyku::API::VERSION
   spec.authors     = ["Chris Colvard"]
   spec.email       = ["chris.colvard@gmail.com"]
   spec.homepage    = ""

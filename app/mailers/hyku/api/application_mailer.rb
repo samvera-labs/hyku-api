@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Hyku
-  module Api
+  module API
     class ApplicationMailer < ActionMailer::Base
       default from: 'from@example.com'
       layout 'mailer'

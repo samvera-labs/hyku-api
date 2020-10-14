@@ -2,7 +2,7 @@
 require "hyku/api/engine"
 
 module Hyku
-  module Api
+  module API
     # Your code goes here...
   end
 end

@@ -1,4 +1,4 @@
-# Hyku::Api
+# Hyku::API
 Short description and motivation.
 
 ## Usage
