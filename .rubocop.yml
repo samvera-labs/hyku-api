@@ -9,6 +9,10 @@ AllCops:
     - 'spec/internal_test_hyku/**/*'
     - 'vendor/**/*' 
 
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+
 Naming/FileName:
   Exclude:
     - 'Gemfile'
