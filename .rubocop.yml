@@ -13,7 +13,15 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
 
+RSpec/ExampleLength:
+  Exclude:
+    - 'spec/requests/v1/tenant_spec.rb'
+
 Naming/FileName:
   Exclude:
     - 'Gemfile'
     - 'hyku-api.gemspec'
+
+Style/GuardClause:
+  Exclude:
+    - 'app/controllers/hyku/api/v1/tenant_controller.rb'

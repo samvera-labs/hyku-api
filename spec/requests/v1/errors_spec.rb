@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require 'rails_helper'
-require 'spec_helper'
 
 RSpec.describe Hyku::API::V1::ErrorsController, type: :request do
   let(:json_response) { JSON.parse(response.body) }
