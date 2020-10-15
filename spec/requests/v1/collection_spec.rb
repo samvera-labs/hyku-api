@@ -2,8 +2,8 @@
 require 'rails_helper'
 
 RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true, multitenant: true do
-  let!(:user) { create(:user) }
   let!(:account) { create(:account, name: 'test') }
+  let(:user) { create(:user) }
   let(:json_response) { JSON.parse(response.body) }
 
   before do
@@ -11,6 +11,7 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
     Apartment::Tenant.create(account.tenant)
     Apartment::Tenant.switch!(account.tenant)
     Site.update(account: account)
+    user # force creating the user in the account
     Apartment::Tenant.reset
   end
 
@@ -53,12 +54,12 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
       end
     end
 
-    xcontext 'when logged in' do
+    context 'when logged in' do
       let!(:collection) { create(:collection, visibility: 'restricted') }
-      let!(:user) { create(:admin) }
+      let(:user) { create(:admin) }
 
       before do
-        post hyku_api.v1_tenant_users_login_path(tenant_id: account.id), params: {
+        post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
           email: user.email,
           password: user.password,
           expire: 2
@@ -142,12 +143,12 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
       end
     end
 
-    xcontext 'when logged in' do
+    context 'when logged in' do
       let!(:collection) { create(:collection, visibility: 'restricted') }
-      let!(:user) { create(:admin) }
+      let(:user) { create(:admin) }
 
       before do
-        post api_v1_user_login_url(tenant_id: account.id), params: {
+        post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
           email: user.email,
           password: user.password,
           expire: 2
@@ -155,7 +156,7 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
       end
 
       it 'returns restricted items' do
-        get "/api/v1/tenant/#{account.tenant}/collection/#{collection.id}", headers: { "Cookie" => response['Set-Cookie'] }
+        get "/api/v1/tenant/#{account.tenant}/collection/#{collection.id}", headers: { "Authorization" => response['Set-Cookie'] }
         expect(response.status).to eq(200)
         expect(json_response['uuid']).to eq collection.id
         expect(response).to render_template('api/v1/collection/_collection')
