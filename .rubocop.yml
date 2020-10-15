@@ -15,7 +15,7 @@ Metrics/BlockLength:
 
 RSpec/ExampleLength:
   Exclude:
-    - 'spec/requests/v1/tenant_spec.rb'
+    - 'spec/requests/**/*'
 
 Naming/FileName:
   Exclude:
@@ -25,3 +25,7 @@ Naming/FileName:
 Style/GuardClause:
   Exclude:
     - 'app/controllers/hyku/api/v1/tenant_controller.rb'
+
+RSpec/LetSetup:
+  Exclude:
+    - 'spec/requests/**/*'
