@@ -25,6 +25,8 @@ module Hyku
           jwt = JWT.decode(token, JWT_SECRET)&.first&.with_indifferent_access
           user = User.find_by(id: jwt['user_id']) if jwt
           sign_in user if user
+        rescue JWT::ExpiredSignature
+          render json: { status: 401, code: 'Invalid credentials', message: "Invalid token" } and return
         end
     end
   end
