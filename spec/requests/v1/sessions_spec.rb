@@ -49,11 +49,11 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
                  agent_type: 'user',
                  agent_id: user.user_key)
         end
-        
+
         before do
           Apartment::Tenant.switch!(account.tenant)
           permission_template_access # force creating the admin set and permission template access
-          Apartment::Tenant.reset      
+          Apartment::Tenant.reset
         end
 
         it 'returns jwt token and json response' do
@@ -144,7 +144,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         before do
           Apartment::Tenant.switch!(account.tenant)
           permission_template_access # force creating the admin set and permission template access
-          Apartment::Tenant.reset      
+          Apartment::Tenant.reset
         end
 
         it 'returns jwt token and json response' do

@@ -24,11 +24,11 @@ module Hyku
           sign_out(current_user)
           response.set_cookie(
             :jwt,
-            value: '', expires: 10000.hours.ago, path: '/', same_site: :none,
+            value: '', expires: 10_000.hours.ago, path: '/', same_site: :none,
             domain: ('.' + request.host), secure: true, httponly: true
           )
 
-          render json: {message: "Successfully logged out"}, status: 200
+          render json: { message: "Successfully logged out" }, status: 200
         end
 
         def refresh
