@@ -4,7 +4,7 @@ require 'jwt'
 module Hyku
   module API
     module V1
-      class SessionsController < Hyku::API::ApplicationController
+      class SessionsController < BaseController
         def create
           user = User.find_for_database_authentication(email: params[:email])
           raise ActionController::BadRequest unless user&.valid_password?(params[:password])

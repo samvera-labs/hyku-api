@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class WorkController < Hyku::API::ApplicationController
+      class WorkController < BaseController
         def index; end
 
         def show; end

@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class FilesController < Hyku::API::ApplicationController
+      class FilesController < BaseController
         def index; end
       end
     end

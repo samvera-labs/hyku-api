@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class HighlightsController < Hyku::API::ApplicationController
+      class HighlightsController < BaseController
         def index; end
       end
     end

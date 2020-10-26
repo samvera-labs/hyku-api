@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class ReviewsController < Hyku::API::ApplicationController
+      class ReviewsController < BaseController
         def create; end
       end
     end

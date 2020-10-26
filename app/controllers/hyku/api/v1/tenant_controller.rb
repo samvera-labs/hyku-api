@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class TenantController < Hyku::API::ApplicationController
+      class TenantController < BaseController
         def index
           @account = Account.find_by(name: params[:name])
           @accounts = Array(@account)

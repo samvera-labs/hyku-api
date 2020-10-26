@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class CollectionController < Hyku::API::ApplicationController
+      class CollectionController < BaseController
         include Blacklight::Controller
         include Hydra::Catalog
         include Hydra::Controller::ControllerBehavior

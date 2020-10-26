@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class ContactFormController < Hyku::API::ApplicationController
+      class ContactFormController < BaseController
         def create
           @contact_form = Hyrax::ContactForm.new(contact_form_params)
 

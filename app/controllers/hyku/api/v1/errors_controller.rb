@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class ErrorsController < Hyku::API::ApplicationController
+      class ErrorsController < BaseController
         def index
           render json: [{ errors: params[:errors] }]
         end

@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class FeaturedWorksController < Hyku::API::ApplicationController
+      class FeaturedWorksController < BaseController
         def create
           # TODO: Add guard against work not existing
           @featured_work = FeaturedWork.new(work_id: params[:id], order: params[:order])

@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class RegistrationsController < Hyku::API::ApplicationController
+      class RegistrationsController < BaseController
         def create; end
       end
     end

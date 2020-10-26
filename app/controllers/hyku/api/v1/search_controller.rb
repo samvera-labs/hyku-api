@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class SearchController < Hyku::API::ApplicationController
+      class SearchController < BaseController
         def index; end
 
         def facet; end
