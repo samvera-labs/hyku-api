@@ -5,13 +5,11 @@ RSpec.describe Hyku::API::V1::ContactFormController, type: :request do
   let!(:account) { create(:account) }
   let(:json_response) { JSON.parse(response.body) }
 
-  before do
-    @old_contact_email = Hyrax.config.contact_email
+  around do |example|
+    old_contact_email = Hyrax.config.contact_email
     Hyrax.config.contact_email = 'admin@example.com'
-  end
-
-  after do
-    Hyrax.config.contact_email = @old_contact_email
+    example.run
+    Hyrax.config.contact_email = old_contact_email
   end
 
   describe "/contact_form" do

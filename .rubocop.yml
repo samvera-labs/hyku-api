@@ -29,7 +29,3 @@ Style/GuardClause:
 RSpec/LetSetup:
   Exclude:
     - 'spec/requests/**/*'
-
-RSpec/InstanceVariable:
-  Exclude:
-    - 'spec/requests/v1/contact_form.rb'
