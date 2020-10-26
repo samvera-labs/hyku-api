@@ -3,17 +3,17 @@ require 'rails_helper'
 
 RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, multitenant: true do
   let(:user) { create(:user) }
-  let!(:account) { create(:account) }
+  let(:account) { create(:account) }
   let(:json_response) { JSON.parse(response.body) }
   let(:jwt_cookie) { response.cookies.with_indifferent_access[:jwt] }
 
   before do
     WebMock.disable!
     Apartment::Tenant.create(account.tenant)
-    Apartment::Tenant.switch!(account.tenant)
-    Site.update(account: account)
-    user # force creating the user in the account
-    Apartment::Tenant.reset
+    Apartment::Tenant.switch(account.tenant) do
+      Site.update(account: account)
+      user # force creating the user in the account
+    end
   end
 
   after do
@@ -51,9 +51,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         end
 
         before do
-          Apartment::Tenant.switch!(account.tenant)
-          permission_template_access # force creating the admin set and permission template access
-          Apartment::Tenant.reset
+          Apartment::Tenant.switch(account.tenant) { permission_template_access }
         end
 
         it 'returns jwt token and json response' do
@@ -142,9 +140,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         end
 
         before do
-          Apartment::Tenant.switch!(account.tenant)
-          permission_template_access # force creating the admin set and permission template access
-          Apartment::Tenant.reset
+          Apartment::Tenant.switch(account.tenant) { permission_template_access }
         end
 
         it 'returns jwt token and json response' do

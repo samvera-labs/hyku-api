@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true, multitenant: true do
-  let!(:account) { create(:account, name: 'test') }
+RSpec.describe Hyku::API::V1::TenantController, type: :request, clean: true, multitenant: true do
+  let(:account) { create(:account, name: 'test') }
   let(:json_response) { JSON.parse(response.body) }
 
   before do
     WebMock.disable!
     Apartment::Tenant.create(account.tenant)
-    Apartment::Tenant.switch!(account.tenant)
-    Site.update(account: account)
-    Apartment::Tenant.reset
+    Apartment::Tenant.switch(account.tenant) { Site.update(account: account) }
   end
 
   after do

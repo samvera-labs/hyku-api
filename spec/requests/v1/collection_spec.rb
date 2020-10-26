@@ -2,17 +2,17 @@
 require 'rails_helper'
 
 RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true, multitenant: true do
-  let!(:account) { create(:account, name: 'test') }
+  let(:account) { create(:account, name: 'test') }
   let(:user) { create(:user) }
   let(:json_response) { JSON.parse(response.body) }
 
   before do
     WebMock.disable!
     Apartment::Tenant.create(account.tenant)
-    Apartment::Tenant.switch!(account.tenant)
-    Site.update(account: account)
-    user # force creating the user in the account
-    Apartment::Tenant.reset
+    Apartment::Tenant.switch(account.tenant) do
+      Site.update(account: account)
+      user # force creating the user in the account
+    end
   end
 
   after do
@@ -32,7 +32,11 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
     end
 
     context 'when repository has content' do
-      let!(:collection) { create(:collection, visibility: 'open') }
+      let(:collection) { create(:collection, visibility: 'open') }
+
+      before do
+        Apartment::Tenant.switch(account.tenant) { collection }
+      end
 
       it 'returns collections' do
         get "/api/v1/tenant/#{account.tenant}/collection"
@@ -44,7 +48,11 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
     end
 
     context 'when not logged in' do
-      let!(:collection) { create(:collection, visibility: 'restricted') }
+      let(:collection) { create(:collection, visibility: 'restricted') }
+
+      before do
+        Apartment::Tenant.switch(account.tenant) { collection }
+      end
 
       it 'does not return restricted items' do
         get "/api/v1/tenant/#{account.tenant}/collection"
@@ -55,10 +63,12 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
     end
 
     context 'when logged in' do
-      let!(:collection) { create(:collection, visibility: 'restricted') }
+      let(:collection) { create(:collection, visibility: 'restricted') }
       let(:user) { create(:admin) }
 
       before do
+        Apartment::Tenant.switch(account.tenant) { collection }
+
         post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
           email: user.email,
           password: user.password,
@@ -76,9 +86,16 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
     end
 
     context 'with per_page' do
-      let!(:collection1) { create(:collection, visibility: 'open') }
-      let!(:collection2) { create(:collection, visibility: 'open') }
+      let(:collection1) { create(:collection, visibility: 'open') }
+      let(:collection2) { create(:collection, visibility: 'open') }
       let(:per_page) { 1 }
+
+      before do
+        Apartment::Tenant.switch(account.tenant) do
+          collection1
+          collection2
+        end
+      end
 
       it 'limits the number of returned collections' do
         get "/api/v1/tenant/#{account.tenant}/collection?per_page=#{per_page}"
@@ -103,7 +120,11 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
     end
 
     context 'with open collection' do
-      let!(:collection) { create(:collection, visibility: 'open') }
+      let(:collection) { create(:collection, visibility: 'open') }
+
+      before do
+        Apartment::Tenant.switch(account.tenant) { collection }
+      end
 
       it 'returns collection json' do
         get "/api/v1/tenant/#{account.tenant}/collection/#{collection.id}"
@@ -132,7 +153,11 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
     end
 
     context 'when not logged in' do
-      let!(:collection) { create(:collection, visibility: 'restricted') }
+      let(:collection) { create(:collection, visibility: 'restricted') }
+
+      before do
+        Apartment::Tenant.switch(account.tenant) { collection }
+      end
 
       it 'does not return restricted collection' do
         get "/api/v1/tenant/#{account.tenant}/collection/#{collection.id}"
@@ -144,10 +169,12 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
     end
 
     context 'when logged in' do
-      let!(:collection) { create(:collection, visibility: 'restricted') }
+      let(:collection) { create(:collection, visibility: 'restricted') }
       let(:user) { create(:admin) }
 
       before do
+        Apartment::Tenant.switch(account.tenant) { collection }
+
         post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
           email: user.email,
           password: user.password,

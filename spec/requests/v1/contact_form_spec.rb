@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe Hyku::API::V1::ContactFormController, type: :request do
-  let!(:account) { create(:account) }
+  let(:account) { create(:account) }
   let(:json_response) { JSON.parse(response.body) }
 
   around do |example|
@@ -10,6 +10,17 @@ RSpec.describe Hyku::API::V1::ContactFormController, type: :request do
     Hyrax.config.contact_email = 'admin@example.com'
     example.run
     Hyrax.config.contact_email = old_contact_email
+  end
+
+  before do
+    WebMock.disable!
+    Apartment::Tenant.create(account.tenant)
+    Apartment::Tenant.switch(account.tenant) { Site.update(account: account) }
+  end
+
+  after do
+    WebMock.enable!
+    Apartment::Tenant.drop(account.tenant)
   end
 
   describe "/contact_form" do

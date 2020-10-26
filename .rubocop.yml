@@ -25,7 +25,3 @@ Naming/FileName:
 Style/GuardClause:
   Exclude:
     - 'app/controllers/hyku/api/v1/tenant_controller.rb'
-
-RSpec/LetSetup:
-  Exclude:
-    - 'spec/requests/**/*'

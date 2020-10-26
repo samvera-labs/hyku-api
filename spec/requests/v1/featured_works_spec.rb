@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe Hyku::API::V1::FeaturedWorksController, type: :request, clean: true do
-  let!(:account) { create(:account) }
+  let(:account) { create(:account) }
   let(:work) { create(:work, visibility: 'open') }
   let(:json_response) { JSON.parse(response.body) }
 
