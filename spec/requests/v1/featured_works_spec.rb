@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-RSpec.describe Hyku::API::V1::FeaturedWorksController, type: :request, clean: true do
+RSpec.describe Hyku::API::V1::FeaturedWorksController, type: :request, clean: true, multitenant: true do
   let(:account) { create(:account) }
   let(:work) { create(:work, visibility: 'open') }
   let(:json_response) { JSON.parse(response.body) }

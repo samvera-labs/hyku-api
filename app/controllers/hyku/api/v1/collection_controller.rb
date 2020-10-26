@@ -14,10 +14,10 @@ module Hyku
 
         def index
           super
-          raise ActiveRecord::RecordNotFound if Collection.count.zero?
+          raise Blacklight::Exceptions::RecordNotFound if Collection.count.zero?
           @collections = @document_list
           @collection_count = @response['response']['numFound']
-        rescue ActiveRecord::RecordNotFound
+        rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This tenant has no collection" }
         end
 
