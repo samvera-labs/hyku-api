@@ -1,6 +1,7 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
-RSpec.describe Hyku::API::V1::RegistrationsController, type: :request do
+RSpec.describe Hyku::API::V1::RegistrationsController, type: :request, clean: true, multitenant: true do
   let(:account) { create(:account) }
   let(:email) { 'user@example.com' }
   let(:password) { 'secure_password' }
