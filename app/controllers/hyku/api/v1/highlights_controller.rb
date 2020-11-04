@@ -3,7 +3,45 @@ module Hyku
   module API
     module V1
       class HighlightsController < BaseController
-        def index; end
+        include Blacklight::Controller
+        include Hydra::Catalog
+        include Hydra::Controller::ControllerBehavior
+
+        configure_blacklight do |config|
+          config.search_builder_class = Hyrax::HomepageSearchBuilder
+        end
+
+        def index
+          @collections = collections(rows: 6)
+          @recent_documents = recent_documents(rows: 6)
+          @featured_works_list = FeaturedWorkList.new.featured_works
+          @featured_works = @featured_works_list.select { |fw| current_ability.can? :read, fw.work_id }.map(&:presenter)
+        end
+
+        private
+
+          # Copied and modified from hyrax homepage controller
+          # Return 5 collections
+          def collections(rows: 5)
+            builder = Hyrax::CollectionSearchBuilder.new(self)
+                                                    .rows(rows)
+            response = repository.search(builder)
+            response.documents
+          rescue Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest
+            []
+          end
+
+          def recent_documents(rows: 4)
+            # grab any recent documents
+            (_, recent_documents) = search_results(q: '', sort: sort_field, rows: rows)
+            recent_documents
+          rescue Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest
+            []
+          end
+
+          def sort_field
+            "system_create_dtsi desc"
+          end
       end
     end
   end
