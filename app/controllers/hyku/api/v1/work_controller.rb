@@ -3,9 +3,77 @@ module Hyku
   module API
     module V1
       class WorkController < BaseController
-        def index; end
+        include Blacklight::Controller
+        include Hydra::Catalog
+        include Hydra::Controller::ControllerBehavior
 
-        def show; end
+        class_attribute :iiif_manifest_builder
+        self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
+
+        # self.search_builder Hyrax::CollectionSearchBuilder
+        configure_blacklight do |config|
+          config.search_builder_class = Hyku::API::WorksSearchBuilder
+        end
+
+        def index
+          super
+          raise Blacklight::Exceptions::RecordNotFound if ActiveFedora::Base.where("generic_type_sim:Work").count.zero?
+          @works = @document_list.map { |doc| Hyku::WorkShowPresenter.new(doc, current_ability, request) }
+          @work_count = @response['response']['numFound']
+        rescue Blacklight::Exceptions::RecordNotFound
+          render json: { status: 404, code: 'not_found', message: no_result_message }
+        end
+
+        def show
+          doc = repository.search(single_item_search_builder.query).documents.first
+          raise Blacklight::Exceptions::RecordNotFound unless doc.present?
+          @work = Hyku::WorkShowPresenter.new(doc, current_ability, request)
+        rescue Blacklight::Exceptions::RecordNotFound
+          render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
+        end
+
+        def manifest
+          @work = repository.search(single_item_search_builder.query).documents.first
+          raise Blacklight::Exceptions::RecordNotFound unless @work.present?
+
+          headers['Access-Control-Allow-Origin'] = '*'
+          render json: iiif_manifest_builder.manifest_for(presenter: iiif_manifest_presenter)
+        rescue Blacklight::Exceptions::RecordNotFound
+          render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
+        end
+
+        private
+
+          # Instantiates the search builder that builds a query for a single item
+          # this is useful in the show view.
+          def single_item_search_builder
+            Hyrax::WorkSearchBuilder.new(self).with(params.except(:q, :page))
+          end
+
+          # Copied and modified from Hyrax WorksControllerBehavior
+          def iiif_manifest_builder
+            self.class.iiif_manifest_builder
+          end
+
+          def iiif_manifest_presenter
+            Hyrax::IiifManifestPresenter.new(@work).tap do |p|
+              p.hostname = request.hostname
+              p.ability = current_ability
+            end
+          end
+          # End copy and modify
+
+          def no_result_message
+            return "This tenant has no #{params[:type].pluralize}" if params[:type].present?
+            # return "There are no results for this query" if params[:availability].present?
+
+            metadata_params = params.except(:availability, :per_page, :page, :format, :controller, :action, :tenant_id).permit!
+            metadata_field, metadata_value = metadata_params.to_h.first
+            return "There are no results for this query" if metadata_value.present? && metadata_field.present?
+
+            # default message
+            "This tenant has no works"
+          end
       end
     end
   end
