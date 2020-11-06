@@ -55,7 +55,7 @@ RSpec.describe Hyku::API::V1::HighlightsController, type: :request, clean: true,
                                          'featured_order')
         expect(json_response['explore_collections'].size).to eq 1
         expect(json_response['explore_collections'][0]['uuid']).to eq collection.id
-        expect(response).to render_template('hyku/api/v1/collection/_collection.jbuilder')
+        expect(response).to render_template('hyku/api/v1/collection/_collection.json.jbuilder')
       end
 
       it 'returns featured_works in highlights' do
@@ -67,7 +67,7 @@ RSpec.describe Hyku::API::V1::HighlightsController, type: :request, clean: true,
                                          'featured_order')
         expect(json_response['featured_works'].size).to eq 1
         expect(json_response['featured_works'][0]['uuid']).to eq work.id
-        expect(response).to render_template('hyku/api/v1/work/_work.jbuilder')
+        expect(response).to render_template('hyku/api/v1/work/_work.json.jbuilder')
       end
 
       it 'returns recent_works in highlights' do
@@ -79,7 +79,7 @@ RSpec.describe Hyku::API::V1::HighlightsController, type: :request, clean: true,
                                          'featured_order')
         expect(json_response['recent_works'].size).to eq 1
         expect(json_response['recent_works'][0]['uuid']).to eq work.id
-        expect(response).to render_template('hyku/api/v1/work/_work.jbuilder')
+        expect(response).to render_template('hyku/api/v1/work/_work.json.jbuilder')
       end
 
       it 'returns featured_order in highlights' do

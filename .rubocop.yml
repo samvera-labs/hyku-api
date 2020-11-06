@@ -11,7 +11,7 @@ AllCops:
 
 Metrics/BlockLength:
   Exclude:
-    - 'app/views/hyku/api/v1/**/*.jbuilder'
+    - 'app/views/hyku/api/v1/**/*.json.jbuilder'
     - 'spec/**/*'
 
 RSpec/ExampleLength:
