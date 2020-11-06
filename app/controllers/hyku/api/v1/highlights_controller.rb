@@ -34,7 +34,7 @@ module Hyku
           def recent_documents(rows: 4)
             # grab any recent documents
             (_, recent_documents) = search_results(q: '', sort: sort_field, rows: rows)
-            recent_documents
+            recent_documents.map { |doc| Hyku::WorkShowPresenter.new(doc, current_ability, request) }
           rescue Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest
             []
           end

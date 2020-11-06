@@ -183,7 +183,7 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
       end
 
       it 'returns restricted items' do
-        get "/api/v1/tenant/#{account.tenant}/collection/#{collection.id}", headers: { "Authorization" => response['Set-Cookie'] }
+        get "/api/v1/tenant/#{account.tenant}/collection/#{collection.id}", headers: { "Cookie" => response['Set-Cookie'] }
         expect(response.status).to eq(200)
         expect(json_response['uuid']).to eq collection.id
         expect(response).to render_template('api/v1/collection/_collection')
