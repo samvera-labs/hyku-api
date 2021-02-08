@@ -14,6 +14,8 @@ json.admin_set_name work.admin_set.first
 #                                         "challenged" => nil,
 json.cname @account.cname
 #                                         "collections" => nil,
+json.contributor work.contributor
+json.creator work.creator
 #                                         "current_he_institution" => nil,
 #                                         "date_accepted" => nil,
 #                                         "date_published" => nil,
