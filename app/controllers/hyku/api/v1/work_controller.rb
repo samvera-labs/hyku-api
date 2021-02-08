@@ -78,8 +78,7 @@ module Hyku
 
           def work_presenter_class(doc)
             model_name = doc.to_model.model_name.name
-            return Hyku::WorkShowPresenter if model_name == "GenericWork"
-            "Hyrax::#{model_name}Presenter".safe_constantize
+            "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
           end
       end
     end
