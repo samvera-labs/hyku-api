@@ -27,7 +27,8 @@ module Hyku
         def show
           doc = repository.search(single_item_search_builder.query).documents.first
           raise Blacklight::Exceptions::RecordNotFound unless doc.present?
-          @work = Hyku::WorkShowPresenter.new(doc, current_ability, request)
+          presenter_class = work_presenter_class(doc)
+          @work = presenter_class.new(doc, current_ability, request)
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
@@ -73,6 +74,12 @@ module Hyku
 
             # default message
             "This tenant has no works"
+          end
+
+          def work_presenter_class(doc)
+            model_name = doc.to_model.model_name.name
+            return Hyku::WorkShowPresenter if model_name == "GenericWork"
+            "Hyrax::#{model_name}Presenter".safe_constantize
           end
       end
     end
