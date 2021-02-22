@@ -12,7 +12,7 @@ module Hyku
           response.set_cookie(
             :jwt,
             value: generate_token(user), expires: 1.hour.from_now, path: '/', same_site: :none,
-            domain: ('.' + request.host), secure: true, httponly: true
+            domain: ('.' + request.host), secure: Rails.env.production?, httponly: true
           )
 
           render json: user.slice(:email).merge(participants: user_admin_set_permissions(user), type: user_roles(user))
@@ -25,7 +25,7 @@ module Hyku
           response.set_cookie(
             :jwt,
             value: '', expires: 10_000.hours.ago, path: '/', same_site: :none,
-            domain: ('.' + request.host), secure: true, httponly: true
+            domain: ('.' + request.host), secure: Rails.env.production?, httponly: true
           )
 
           render json: { message: "Successfully logged out" }, status: 200
@@ -37,7 +37,7 @@ module Hyku
           response.set_cookie(
             :jwt,
             value: generate_token(current_user), expires: 1.hour.from_now, path: '/', same_site: :none,
-            domain: ('.' + request.host), secure: true, httponly: true
+            domain: ('.' + request.host), secure: Rails.env.production?, httponly: true
           )
 
           render json: current_user.slice(:email).merge(participants: user_admin_set_permissions(current_user), type: user_roles(current_user))

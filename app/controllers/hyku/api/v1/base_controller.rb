@@ -3,6 +3,7 @@ module Hyku
   module API
     module V1
       class BaseController < Hyku::API::ApplicationController
+        skip_before_action :verify_authenticity_token
         JWT_SECRET = Rails.application.secrets.secret_key_base
 
         before_action do
