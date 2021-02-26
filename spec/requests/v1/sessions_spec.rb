@@ -100,7 +100,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
     end
 
     it 'successfully logs out' do
-      get hyku_api.v1_tenant_users_log_out_path(tenant_id: account.tenant)
+      delete hyku_api.v1_tenant_users_log_out_path(tenant_id: account.tenant)
       expect(response.status).to eq(200)
       expect(json_response['message']).to eq("Successfully logged out")
       expect(jwt_cookie).to be_falsey

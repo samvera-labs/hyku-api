@@ -19,7 +19,7 @@ Hyku::API::Engine.routes.draw do
         post 'contact_form', to: 'contact_form#create'
         # user routes
         post 'users/login', to: 'sessions#create'
-        get 'users/log_out', to: 'sessions#destroy'
+        delete 'users/log_out', to: 'sessions#destroy'
         post 'users/refresh', to: 'sessions#refresh'
         post 'users/signup', to: 'registrations#create'
       end
