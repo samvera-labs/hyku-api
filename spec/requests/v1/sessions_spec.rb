@@ -6,6 +6,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
   let(:account) { create(:account) }
   let(:json_response) { JSON.parse(response.body) }
   let(:jwt_cookie) { response.cookies.with_indifferent_access[:jwt] }
+  let(:refresh_cookie) { response.cookies.with_indifferent_access[:refresh] }
 
   before do
     WebMock.disable!
@@ -37,6 +38,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         expect(json_response['participants']).to eq []
         expect(json_response['type']).to eq []
         expect(jwt_cookie).to be_truthy
+        expect(refresh_cookie).to be_truthy
       end
 
       context 'with type and participants' do
@@ -65,23 +67,25 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
           expect(json_response['participants']).to eq [{ admin_set.title.first => "manage" }]
           expect(json_response['type']).to eq ['admin']
           expect(jwt_cookie).to be_truthy
+          expect(refresh_cookie).to be_truthy
         end
       end
+    end
 
-      context 'with invalid credentials' do
-        let(:password_credentials) { '' }
+    context 'with invalid credentials' do
+      let(:password_credentials) { '' }
 
-        it 'does not return jwt token' do
-          post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-            email: email_credentials,
-            password: password_credentials,
-            expire: 2
-          }
-          expect(response.status).to eq(200)
-          expect(json_response['status']).to eq(401)
-          expect(json_response['message']).to eq("Invalid email or password.")
-          expect(jwt_cookie).to be_falsey
-        end
+      it 'does not return jwt token' do
+        post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
+          email: email_credentials,
+          password: password_credentials,
+          expire: 2
+        }
+        expect(response.status).to eq(401)
+        expect(json_response['status']).to eq(401)
+        expect(json_response['message']).to eq("Invalid email or password.")
+        expect(jwt_cookie).to be_falsey
+        expect(refresh_cookie).to be_falsey
       end
     end
   end
@@ -100,11 +104,13 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
       expect(response.status).to eq(200)
       expect(json_response['message']).to eq("Successfully logged out")
       expect(jwt_cookie).to be_falsey
+      expect(refresh_cookie).to be_falsey
     end
   end
 
   describe "/refresh" do
-    context 'with an unexpired jwt token' do
+    let(:auth_header) { { "Authorization" => "Bearer #{refresh_cookie}" } }
+    context 'with an unexpired refresh token' do
       before do
         post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
           email: user.email,
@@ -113,19 +119,25 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         }
       end
 
-      it "refreshs the jwt token" do
+      it "refreshes the jwt token" do
         sleep(1)
-        expect { post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: { "Cookie" => response['Set-Cookie'] } }.to change { response.cookies.with_indifferent_access[:jwt] }
-        expect(jwt_cookie).to be_truthy
+        expect { post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: auth_header }.to change { response.cookies.with_indifferent_access[:jwt] }
+      end
+
+      it "refreshes the refresh token" do
+        sleep(1)
+        expect { post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: auth_header }.to change { response.cookies.with_indifferent_access[:refresh] }
       end
 
       it 'returns jwt token and json response' do
-        post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: { "Cookie" => response['Set-Cookie'] }
+        sleep(1)
+        post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: { "Authorization" => "Bearer #{response.cookies.with_indifferent_access[:refresh]}" }
         expect(response.status).to eq(200)
         expect(json_response['email']).to eq(user.email)
         expect(json_response['participants']).to eq []
         expect(json_response['type']).to eq []
         expect(jwt_cookie).to be_truthy
+        expect(response.cookies.with_indifferent_access[:refresh]).to be_truthy
       end
 
       context 'with type and participants' do
@@ -144,17 +156,17 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         end
 
         it 'returns jwt token and json response' do
-          post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: { "Cookie" => response['Set-Cookie'] }
+          sleep(1)
+          post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: { "Authorization" => "Bearer #{refresh_cookie}" }
           expect(response.status).to eq(200)
           expect(json_response['email']).to eq(user.email)
           expect(json_response['participants']).to eq [{ admin_set.title.first => "manage" }]
           expect(json_response['type']).to eq ['admin']
-          expect(jwt_cookie).to be_truthy
         end
       end
     end
 
-    context 'with an expired jwt token' do
+    context 'with an expired refresh token' do
       before do
         post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
           email: user.email,
@@ -164,12 +176,13 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
       end
 
       it 'returns an error' do
-        travel_to(Time.now.utc + 4.hours) do
-          post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: { "Cookie" => response['Set-Cookie'] }
-          expect(response.status).to eq(200)
+        travel_to(Time.now.utc + 4.weeks) do
+          post hyku_api.v1_tenant_users_refresh_path(tenant_id: account.tenant), headers: { "Authorization" => "Bearer #{refresh_cookie}" }
+          expect(response.status).to eq(401)
           expect(json_response['status']).to eq(401)
           expect(json_response['message']).to eq("Invalid token")
           expect(jwt_cookie).to be_falsey
+          expect(response.cookies.with_indifferent_access[:refresh]).to be_falsey
         end
       end
     end
