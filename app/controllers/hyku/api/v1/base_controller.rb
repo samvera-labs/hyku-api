@@ -3,30 +3,39 @@ module Hyku
   module API
     module V1
       class BaseController < Hyku::API::ApplicationController
-        skip_before_action :verify_authenticity_token
+        protect_from_forgery unless: -> { request.format.json? }
         JWT_SECRET = Rails.application.secrets.secret_key_base
 
-        before_action do
-          @account = Account.find_by(tenant: params[:tenant_id])
-          AccountElevator.switch!(@account.cname) if @account.present?
-        end
-
-        before_action do
-          if request.headers['Authorization'].present?
-            login_from_token(request.authorization.match(/jwt=([\w.]+)\;/).try(:[], 1))
-          elsif cookies[:jwt].present?
-            login_from_token(cookies[:jwt])
-          end
-        end
+        before_action :load_account, :load_token
 
         private
+
+          def load_token(name = :jwt)
+            if request.headers['Authorization'].present?
+              login_from_token(request.authorization.match(/Bearer ([\w.]+)/).try(:[], 1))
+            elsif cookies[name].present?
+              login_from_token(cookies[name])
+            end
+          end
 
           def login_from_token(token)
             jwt = JWT.decode(token, JWT_SECRET)&.first&.with_indifferent_access
             user = User.find_by(id: jwt['user_id']) if jwt
             sign_in user if user
           rescue JWT::ExpiredSignature, JWT::DecodeError
-            render(json: { status: 401, code: 'Invalid credentials', message: "Invalid token" }) && (return)
+            access_denied
+          end
+
+          def current_account
+            @account ||= Account.find_by(tenant: params[:tenant_id])
+          end
+
+          def load_account
+            AccountElevator.switch!(current_account.cname) if current_account.present?
+          end
+
+          def access_denied(message = "Invalid token")
+            render(json: { status: 401, code: 'Invalid credentials', message: message }, status: 401) && return
           end
       end
     end
