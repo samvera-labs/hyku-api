@@ -3,6 +3,8 @@ module Hyku
   module API
     module V1
       class TenantController < BaseController
+        skip_before_action :load_account, :load_token
+
         def index
           @account = Account.find_by(name: params[:name])
           @accounts = Array(@account)

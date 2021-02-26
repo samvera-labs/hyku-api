@@ -75,7 +75,7 @@ RSpec.describe 'REST API V1 Routing', type: :routing do
             expect(post: "/api/v1/tenant/abc/users/login").to route_to("hyku/api/v1/sessions#create", tenant_id: 'abc', format: :json)
           end
           it "routes to #log_out via GET" do
-            expect(get: "/api/v1/tenant/abc/users/log_out").to route_to("hyku/api/v1/sessions#destroy", tenant_id: 'abc', format: :json)
+            expect(delete: "/api/v1/tenant/abc/users/log_out").to route_to("hyku/api/v1/sessions#destroy", tenant_id: 'abc', format: :json)
           end
           it "routes to #refresh via POST" do
             expect(post: "/api/v1/tenant/abc/users/refresh").to route_to("hyku/api/v1/sessions#refresh", tenant_id: 'abc', format: :json)
