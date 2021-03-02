@@ -69,10 +69,14 @@ module Hyku
             {
               path: '/',
               same_site: :lax,
-              domain: ('.' + request.host),
+              domain: ('.' + cookie_domain),
               secure: Rails.env.production?,
               httponly: true
             }
+          end
+
+          def cookie_domain
+            @account.frontend_url.presence || request.host
           end
       end
     end
