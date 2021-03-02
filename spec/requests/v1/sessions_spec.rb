@@ -80,9 +80,9 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         context "an account with a valid frontend_url" do
           before do
             post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-                email: email_credentials,
-                password: password_credentials,
-                expire: 2
+              email: email_credentials,
+              password: password_credentials,
+              expire: 2
             }
           end
 
@@ -97,9 +97,9 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
           before do
             host! 'subdomain.domain.com'
             post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-                email: email_credentials,
-                password: password_credentials,
-                expire: 2
+              email: email_credentials,
+              password: password_credentials,
+              expire: 2
             }
           end
           let(:frontend_url) { nil }
