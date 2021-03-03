@@ -74,37 +74,29 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
 
       describe ".cookies" do
         before do
-          account.update frontend_url: frontend_url
+          host! 'subdomain.domain.com'
+          allow(account).to receive(:attributes).and_return(frontend_url: frontend_url)
+          allow(Account).to receive(:find_by).and_return(account)
+          post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
+            email: email_credentials,
+            password: password_credentials,
+            expire: 2
+          }
+          sleep(1)
         end
 
         context "an account with a valid frontend_url" do
-          before do
-            post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-              email: email_credentials,
-              password: password_credentials,
-              expire: 2
-            }
-          end
+          let(:frontend_url) { "domain.com" }
 
-          let(:frontend_url) { "example.com" }
-
-          it "sets the frontend_url as cookie domain" do
+          it "sets the frontend_url as domain" do
             expect(jwt_cookie_details.domain).to eq ".#{frontend_url}"
           end
         end
 
         context "an account with no frontend_url" do
-          before do
-            host! 'subdomain.domain.com'
-            post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-              email: email_credentials,
-              password: password_credentials,
-              expire: 2
-            }
-          end
           let(:frontend_url) { nil }
 
-          it "sets the frontend_url as cookie domain" do
+          it "sets the request host as domain" do
             expect(jwt_cookie_details.domain).to eq '.subdomain.domain.com'
           end
         end

@@ -76,7 +76,7 @@ module Hyku
           end
 
           def cookie_domain
-            @account.frontend_url.presence || request.host
+            current_account.attributes.with_indifferent_access[:frontend_url].presence || request.host
           end
       end
     end
