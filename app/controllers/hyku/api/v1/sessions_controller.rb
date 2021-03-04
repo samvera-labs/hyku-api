@@ -39,7 +39,7 @@ module Hyku
         private
 
           def set_jwt_cookies(user)
-            set_jwt_cookie(:jwt, value: generate_token(user_id: user.id, type: user_roles(user)), expires: 1.hour.from_now)
+            set_jwt_cookie(:jwt, value: generate_token(user_id: user.id, type: user_roles(user)), expires: 1.week.from_now)
             set_jwt_cookie(:refresh, value: generate_token(user_id: user.id), expires: 1.week.from_now)
           end
 
