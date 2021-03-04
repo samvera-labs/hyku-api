@@ -21,6 +21,7 @@ Hyku::API::Engine.routes.draw do
         post 'users/login', to: 'sessions#create'
         delete 'users/log_out', to: 'sessions#destroy'
         post 'users/refresh', to: 'sessions#refresh'
+        post 'users/current', to: 'sessions#show'
         post 'users/signup', to: 'registrations#create'
       end
       get 'errors', to: 'errors#index', defaults: { format: :json }

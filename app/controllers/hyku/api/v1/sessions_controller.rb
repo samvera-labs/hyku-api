@@ -5,14 +5,14 @@ module Hyku
   module API
     module V1
       class SessionsController < BaseController
-        skip_before_action :load_token, except: :destroy
+        skip_before_action :load_token, except: [:destroy, :show]
 
         def create
           user = User.find_for_database_authentication(email: params[:email])
           raise ActionController::BadRequest unless user&.valid_password?(params[:password])
 
           set_jwt_cookies(user)
-          render json: user.slice(:email).merge(participants: user_admin_set_permissions(user), type: user_roles(user))
+          render_user(user)
         rescue ActionController::BadRequest
           access_denied("Invalid email or password.")
         end
@@ -26,24 +26,17 @@ module Hyku
         def refresh
           if load_token(:refresh)
             set_jwt_cookies(current_user)
-            render json: current_user.slice(:email).merge(participants: user_admin_set_permissions(current_user), type: user_roles(current_user))
+            render_user
           else
             remove_jwt_cookies
           end
         end
 
+        def show
+          render_user
+        end
+
         private
-
-          def user_roles(user)
-            # Need to call `.uniq` because admin role can appear twice
-            user.roles.map(&:name).uniq - ['super_admin']
-          end
-
-          def user_admin_set_permissions(user)
-            Hyrax::PermissionTemplateAccess.where(agent_id: user.user_key).collect do |pta|
-              { pta.permission_template.admin_set&.title&.first => pta.access }
-            end
-          end
 
           def set_jwt_cookies(user)
             set_jwt_cookie(:jwt, value: generate_token(user_id: user.id, type: user_roles(user)), expires: 1.hour.from_now)
@@ -77,6 +70,22 @@ module Hyku
 
           def cookie_domain
             current_account.attributes.with_indifferent_access[:frontend_url].presence || request.host
+          end
+
+          def render_user(user = nil)
+            user ||= current_user
+            render json: user.slice(:email).merge(participants: user_admin_set_permissions(user), type: user_roles(user))
+          end
+
+          def user_roles(user)
+            # Need to call `.uniq` because admin role can appear twice
+            user.roles.map(&:name).uniq - ['super_admin']
+          end
+
+          def user_admin_set_permissions(user)
+            Hyrax::PermissionTemplateAccess.where(agent_id: user.user_key).collect do |pta|
+              { pta.permission_template.admin_set&.title&.first => pta.access }
+            end
           end
       end
     end

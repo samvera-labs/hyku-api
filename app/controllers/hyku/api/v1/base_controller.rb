@@ -35,7 +35,7 @@ module Hyku
           end
 
           def access_denied(message = "Invalid token")
-            render(json: { status: 401, code: 'Invalid credentials', message: message }, status: 401) && return
+            render(json: { status: 401, code: 'Invalid credentials', message: message }, status: 401) && false
           end
       end
     end
