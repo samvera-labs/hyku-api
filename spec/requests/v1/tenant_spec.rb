@@ -30,9 +30,9 @@ RSpec.describe Hyku::API::V1::TenantController, type: :request, clean: true, mul
       let(:user) { create(:user) }
       before do
         post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-            email: user.email,
-            password: user.password,
-            expire: 2
+          email: user.email,
+          password: user.password,
+          expire: 2
         }
         sleep 1
       end

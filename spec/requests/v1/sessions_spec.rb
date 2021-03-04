@@ -71,8 +71,6 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
           expect(refresh_cookie).to be_truthy
         end
       end
-
-
     end
 
     context 'with invalid credentials' do
@@ -99,9 +97,9 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
       allow(account).to receive(:attributes).and_return(frontend_url: frontend_url)
       allow(Account).to receive(:find_by).and_return(account)
       post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-          email: user.email,
-          password: user.password,
-          expire: 2
+        email: user.email,
+        password: user.password,
+        expire: 2
       }
       sleep(1)
     end
@@ -226,9 +224,9 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
     context 'with an unexpired refresh token' do
       before do
         post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-            email: user.email,
-            password: user.password,
-            expire: 2
+          email: user.email,
+          password: user.password,
+          expire: 2
         }
       end
       it 'returns the json response' do
