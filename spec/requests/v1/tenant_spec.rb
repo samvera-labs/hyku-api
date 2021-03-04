@@ -26,6 +26,34 @@ RSpec.describe Hyku::API::V1::TenantController, type: :request, clean: true, mul
       end
     end
 
+    context 'with a valid login token' do
+      let(:user) { create(:user) }
+      before do
+        post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
+          email: user.email,
+          password: user.password,
+          expire: 2
+        }
+        sleep 1
+      end
+
+      it 'returns the tenants' do
+        get "/api/v1/tenant?name=#{account.name}", headers: { 'Authorization': "Bearer #{request.cookies['jwt']}" }
+        expect(response.status).to eq(200)
+        expect(json_response.size).to eq 1
+      end
+    end
+
+    context 'with an invalid login token' do
+      let(:user) { create(:user) }
+
+      it 'returns the tenants' do
+        get "/api/v1/tenant?name=#{account.name}", headers: { 'Authorization': "Bearer foobar.baz" }
+        expect(response.status).to eq(200)
+        expect(json_response.size).to eq 1
+      end
+    end
+
     context 'with name param' do
       it 'returns tenant json' do
         get "/api/v1/tenant?name=#{account.name}"

@@ -71,36 +71,6 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
           expect(refresh_cookie).to be_truthy
         end
       end
-
-      describe ".cookies" do
-        before do
-          host! 'subdomain.domain.com'
-          allow(account).to receive(:attributes).and_return(frontend_url: frontend_url)
-          allow(Account).to receive(:find_by).and_return(account)
-          post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-            email: email_credentials,
-            password: password_credentials,
-            expire: 2
-          }
-          sleep(1)
-        end
-
-        context "an account with a valid frontend_url" do
-          let(:frontend_url) { "domain.com" }
-
-          it "sets the frontend_url as domain" do
-            expect(jwt_cookie_details.domain).to eq ".#{frontend_url}"
-          end
-        end
-
-        context "an account with no frontend_url" do
-          let(:frontend_url) { nil }
-
-          it "sets the request host as domain" do
-            expect(jwt_cookie_details.domain).to eq '.subdomain.domain.com'
-          end
-        end
-      end
     end
 
     context 'with invalid credentials' do
@@ -117,6 +87,36 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         expect(json_response['message']).to eq("Invalid email or password.")
         expect(jwt_cookie).to be_falsey
         expect(refresh_cookie).to be_falsey
+      end
+    end
+  end
+
+  describe ".cookies" do
+    before do
+      host! 'subdomain.domain.com'
+      allow(account).to receive(:attributes).and_return(frontend_url: frontend_url)
+      allow(Account).to receive(:find_by).and_return(account)
+      post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
+        email: user.email,
+        password: user.password,
+        expire: 2
+      }
+      sleep(1)
+    end
+
+    context "for a valid frontend_url" do
+      let(:frontend_url) { "domain.com" }
+
+      it "sets the frontend_url as domain" do
+        expect(jwt_cookie_details.domain).to eq ".#{frontend_url}"
+      end
+    end
+
+    context "for no frontend_url" do
+      let(:frontend_url) { nil }
+
+      it "sets the request host as domain" do
+        expect(jwt_cookie_details.domain).to eq '.subdomain.domain.com'
       end
     end
   end
@@ -215,6 +215,38 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
           expect(jwt_cookie).to be_falsey
           expect(response.cookies.with_indifferent_access[:refresh]).to be_falsey
         end
+      end
+    end
+  end
+
+  describe "show" do
+    let(:auth_header) { { "Authorization" => "Bearer #{refresh_cookie}" } }
+    context 'with an unexpired refresh token' do
+      before do
+        post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
+          email: user.email,
+          password: user.password,
+          expire: 2
+        }
+      end
+      it 'returns the json response' do
+        sleep(1)
+        post hyku_api.v1_tenant_users_current_path(tenant_id: account.tenant), headers: { "Authorization" => "Bearer #{response.cookies.with_indifferent_access[:jwt]}" }
+        expect(response.status).to eq(200)
+        expect(json_response['email']).to eq(user.email)
+        expect(json_response['participants']).to eq []
+        expect(json_response['type']).to eq []
+      end
+    end
+
+    context 'with an invalid token' do
+      it 'returns the json response' do
+        sleep(1)
+        post hyku_api.v1_tenant_users_current_path(tenant_id: account.tenant), headers: { "Authorization" => "Bearer foobar" }
+        expect(response.status).to eq(401)
+        expect(json_response['email']).to be_blank
+        expect(json_response['participants']).to be_blank
+        expect(json_response['type']).to be_blank
       end
     end
   end
