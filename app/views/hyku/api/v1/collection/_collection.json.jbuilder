@@ -14,6 +14,11 @@ json.resource_type collection.resource_type&.first
 json.rights_statements_for_api_tesim collection.rights_statement&.first
 json.thumbnail_base64_string nil
 json.thumbnail_url collection.thumbnail_path
+if Hyrax::PresenterFactory.build_for(ids: [collection.thumbnail_id], presenter_class: Hyrax::FileSetPresenter, presenter_args: [current_ability, request]).first&.solr_document&.public?
+  json.thumbnail_url URI::Generic.build(scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'), host: @account.cname, path: collection.thumbnail_path)
+else
+  json.thumbnail_url nil
+end
 json.title collection.title&.first
 json.type "collection"
 json.visibility collection.visibility

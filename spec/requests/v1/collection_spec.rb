@@ -143,12 +143,28 @@ RSpec.describe Hyku::API::V1::CollectionController, type: :request, clean: true,
                                          'rights_statements_for_api_tesim' => nil,
                                          'language' => nil,
                                          'publisher' => nil,
-                                         'thumbnail_url' => be_a(String), # url
+                                         'thumbnail_url' => nil,
                                          'visibility' => 'open',
                                          'works' => [],
                                          'volumes' => nil,
                                          'thumbnail_base64_string' => nil)
         expect(response).to render_template('api/v1/collection/_collection')
+      end
+
+      context 'with thumbnail' do
+        let(:file_with_image) { create(:api_file_set, :public, :image) }
+
+        before do
+          collection.thumbnail_id = file_with_image.id
+          collection.save!
+          # FIXME: collection.thumbnail_path is still the default collection icon due to the file not getting a derivative generated
+        end
+
+        it 'returns work json' do
+          get "/api/v1/tenant/#{account.tenant}/collection/#{collection.id}"
+          expect(response.status).to eq(200)
+          expect(json_response).to include("thumbnail_url" => URI.join("http://#{account.cname}", collection.to_solr['thumbnail_path_ss']).to_s)
+        end
       end
     end
 
