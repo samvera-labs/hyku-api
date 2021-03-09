@@ -40,7 +40,7 @@ module Hyku
 
           def set_jwt_cookies(user)
             set_jwt_cookie(:jwt, value: generate_token(user_id: user.id, type: user_roles(user)), expires: 1.week.from_now)
-            set_jwt_cookie(:refresh, value: generate_token(user_id: user.id), expires: 1.week.from_now)
+            set_jwt_cookie(:refresh, value: generate_token(user_id: user.id, exp: 1.week.from_now.to_i), expires: 1.week.from_now)
           end
 
           def remove_jwt_cookies
@@ -55,7 +55,7 @@ module Hyku
           end
 
           def generate_token(payload = {})
-            JWT.encode(payload.merge(exp: (Time.now.utc + 1.hour).to_i), JWT_SECRET)
+            JWT.encode(payload.reverse_merge(exp: (Time.now.utc + 1.hour).to_i), JWT_SECRET)
           end
 
           def default_cookie_options
