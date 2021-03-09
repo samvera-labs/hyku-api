@@ -8,7 +8,7 @@ module Hyku
         include Hydra::Controller::ControllerBehavior
 
         include Blacklight::Configurable
-        copy_blacklight_config_from(CatalogController)
+        copy_blacklight_config_from(::CatalogController)
 
         def index
           super
