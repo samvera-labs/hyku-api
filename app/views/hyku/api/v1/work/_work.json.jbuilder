@@ -31,7 +31,11 @@ json.date_submitted work.date_uploaded
 #                                         "event_date" => nil,
 #                                         "event_location" => nil,
 #                                         "event_title" => nil,
-# json.files nil
+json.files do
+  json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document.private? }
+  json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? }
+  json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document.public? }
+end
 #                                         "funder" => nil,
 #                                         "funder_project_reference" => nil,
 #                                         "institution" => nil,

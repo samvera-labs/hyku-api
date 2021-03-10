@@ -374,7 +374,11 @@ RSpec.describe Hyku::API::V1::WorkController, type: :request, clean: true, multi
                                          #  "event_date" => nil,
                                          #  "event_location" => nil,
                                          #  "event_title" => nil,
-                                         #  "files" => nil,
+                                         "files" => {
+                                           "has_private_files" => false,
+                                           "has_registered_files" => false,
+                                           "has_public_files" => false
+                                         },
                                          #  "funder" => nil,
                                          #  "funder_project_reference" => nil,
                                          #  "institution" => nil,
@@ -431,19 +435,41 @@ RSpec.describe Hyku::API::V1::WorkController, type: :request, clean: true, multi
 
       context 'with files' do
         let(:work) { create(:work, visibility: 'open') }
-        let(:file_with_image) { create(:api_file_set, :public, :image) }
 
-        before do
-          work.ordered_members += [file_with_image]
-          work.representative_id = file_with_image.id
-          work.save!
-          # FIXME: collection.thumbnail_path is still the default work icon due to the file not getting a derivative generated
+        context 'thumbnail url' do
+          let(:file_with_image) { create(:api_file_set, :public, :image) }
+
+          before do
+            work.ordered_members += [file_with_image]
+            work.representative_id = file_with_image.id
+            work.save!
+            # FIXME: collection.thumbnail_path is still the default work icon due to the file not getting a derivative generated
+          end
+
+          it 'returns work json' do
+            get "/api/v1/tenant/#{account.tenant}/work/#{work.id}"
+            expect(response.status).to eq(200)
+            expect(json_response).to include("thumbnail_url" => URI.join("http://#{account.cname}", work.to_solr['thumbnail_path_ss']).to_s)
+          end
         end
 
-        it 'returns work json' do
-          get "/api/v1/tenant/#{account.tenant}/work/#{work.id}"
-          expect(response.status).to eq(200)
-          expect(json_response).to include("thumbnail_url" => URI.join("http://#{account.cname}", work.to_solr['thumbnail_path_ss']).to_s)
+        context 'file visibility' do
+          let(:public_file) { create(:file_set, visibility: 'open') }
+          let(:institution_file) { create(:file_set, visibility: 'authenticated') }
+          let(:private_file) { create(:file_set, visibility: 'restricted') }
+
+          before do
+            work.ordered_members += [public_file, institution_file, private_file]
+            work.save!
+          end
+
+          it 'returns work json' do
+            get "/api/v1/tenant/#{account.tenant}/work/#{work.id}"
+            expect(response.status).to eq(200)
+            expect(json_response["files"]).to include("has_private_files" => true,
+                                                      "has_registered_files" => true,
+                                                      "has_public_files" => true)
+          end
         end
       end
     end
