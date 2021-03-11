@@ -8,7 +8,7 @@ module Hyku
         include Hydra::Controller::ControllerBehavior
 
         def index
-          @files = work_presenter&.file_set_presenters
+          @files = authorized_file_set_presenters
 
           raise Blacklight::Exceptions::RecordNotFound unless @files.present?
         rescue Blacklight::Exceptions::RecordNotFound
@@ -16,6 +16,10 @@ module Hyku
         end
 
         private
+
+          def authorized_file_set_presenters
+            work_presenter&.file_set_presenters&.select { |fsp| current_ability.can?(:read, fsp.id) }
+          end
 
           def work_presenter
             return nil if work_document.nil?

@@ -80,6 +80,25 @@ RSpec.describe Hyku::API::V1::FilesController, type: :request, clean: true, mult
         expect(json_response['code']).to eq('not_found')
         expect(json_response['message']).to eq "Work with id of #{work.id} has no files attached to it"
       end
+
+      context 'with public work' do
+        let!(:work) { create(:work, visibility: 'open') }
+        let(:public_file) { create(:file_set, visibility: 'open') }
+        let(:institution_file) { create(:file_set, visibility: 'authenticated') }
+        let(:private_file) { create(:file_set, visibility: 'restricted') }
+
+        before do
+          work.ordered_members += [public_file, institution_file, private_file]
+          work.save!
+        end
+
+        it 'returns only public files for open works' do
+          get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/files"
+          expect(response.status).to eq(200)
+          expect(json_response.size).to eq 1
+          expect(json_response[0]).to include('uuid' => public_file.id)
+        end
+      end
     end
 
     context 'when logged in' do
@@ -98,6 +117,25 @@ RSpec.describe Hyku::API::V1::FilesController, type: :request, clean: true, mult
         get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/files", headers: { "Cookie" => response['Set-Cookie'] }
         expect(response.status).to eq(200)
         expect(json_response[0]).to include('uuid' => file_set.id)
+      end
+
+      context 'with public work' do
+        let(:user) { create(:user) }
+        let(:work) { create(:work, visibility: 'authenticated') }
+        let(:institution_file) { create(:file_set, visibility: 'authenticated') }
+        let(:private_file) { create(:file_set, visibility: 'restricted') }
+
+        before do
+          work.ordered_members += [institution_file, private_file]
+          work.save!
+        end
+
+        it 'returns only public files for open works' do
+          get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/files"
+          expect(response.status).to eq(200)
+          expect(json_response.size).to eq 1
+          expect(json_response[0]).to include('uuid' => institution_file.id)
+        end
       end
     end
   end
