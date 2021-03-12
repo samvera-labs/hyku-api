@@ -23,7 +23,7 @@ module Hyku
             user = User.find_by(id: jwt['user_id']) if jwt
             sign_in user if user
           rescue JWT::ExpiredSignature, JWT::DecodeError
-            access_denied
+            render_unauthorised
           end
 
           def current_account
@@ -34,7 +34,7 @@ module Hyku
             AccountElevator.switch!(current_account.cname) if current_account.present?
           end
 
-          def access_denied(message = "Invalid token")
+          def render_unauthorised(message = "Invalid token")
             render(json: { status: 401, code: 'Invalid credentials', message: message }, status: 401) && false
           end
       end

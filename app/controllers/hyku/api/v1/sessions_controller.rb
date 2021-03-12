@@ -14,7 +14,7 @@ module Hyku
           set_jwt_cookies(user)
           render_user(user)
         rescue ActionController::BadRequest
-          access_denied("Invalid email or password.")
+          render_unauthorised("Invalid email or password.")
         end
 
         def destroy
