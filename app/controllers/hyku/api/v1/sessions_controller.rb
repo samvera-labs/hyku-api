@@ -10,7 +10,7 @@ module Hyku
         def create
           user = User.find_for_database_authentication(email: params[:email])
           raise ActionController::BadRequest unless user&.valid_password?(params[:password])
-
+          sign_in user
           set_jwt_cookies(user)
           render_user(user)
         rescue ActionController::BadRequest

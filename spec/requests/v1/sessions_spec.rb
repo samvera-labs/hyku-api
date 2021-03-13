@@ -8,6 +8,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
   let(:jwt_cookie) { response.cookies.with_indifferent_access[:jwt] }
   let(:jwt_cookie_details) { cookies.send(:hash_for, nil).fetch('jwt', nil) }
   let(:refresh_cookie) { response.cookies.with_indifferent_access[:refresh] }
+  let(:hyku_session_cookie) { response.cookies.with_indifferent_access[:_hyku_session] }
 
   before do
     WebMock.disable!
@@ -40,6 +41,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         expect(json_response['type']).to eq []
         expect(jwt_cookie).to be_truthy
         expect(refresh_cookie).to be_truthy
+        expect(hyku_session_cookie).to be_truthy
       end
 
       context 'with type and participants' do
@@ -69,6 +71,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
           expect(json_response['type']).to eq ['admin']
           expect(jwt_cookie).to be_truthy
           expect(refresh_cookie).to be_truthy
+          expect(hyku_session_cookie).to be_truthy
         end
       end
     end
@@ -87,6 +90,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         expect(json_response['message']).to eq("Invalid email or password.")
         expect(jwt_cookie).to be_falsey
         expect(refresh_cookie).to be_falsey
+        expect(hyku_session_cookie).to be_falsey
       end
     end
   end
@@ -168,6 +172,7 @@ RSpec.describe Hyku::API::V1::SessionsController, type: :request, clean: true, m
         expect(json_response['participants']).to eq []
         expect(json_response['type']).to eq []
         expect(jwt_cookie).to be_truthy
+        expect(hyku_session_cookie).to be_truthy
         expect(response.cookies.with_indifferent_access[:refresh]).to be_truthy
       end
 
