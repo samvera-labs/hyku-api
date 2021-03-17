@@ -119,7 +119,7 @@ RSpec.describe Hyku::API::V1::FilesController, type: :request, clean: true, mult
         expect(json_response[0]).to include('uuid' => file_set.id)
       end
 
-      context 'with public work' do
+      context 'as a non-admin user' do
         let(:user) { create(:user) }
         let(:work) { create(:work, visibility: 'authenticated') }
         let(:institution_file) { create(:file_set, visibility: 'authenticated') }
@@ -130,7 +130,7 @@ RSpec.describe Hyku::API::V1::FilesController, type: :request, clean: true, mult
           work.save!
         end
 
-        it 'returns only public files for open works' do
+        it 'returns only public files' do
           get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/files"
           expect(response.status).to eq(200)
           expect(json_response.size).to eq 1
