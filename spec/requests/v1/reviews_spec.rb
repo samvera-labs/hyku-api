@@ -46,38 +46,38 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
     context 'with proper privileges' do
       let(:user) { approving_user }
 
-      before do
-        Apartment::Tenant.switch(account.tenant) { user }
-      end
-
       it "adds comment" do
-        expect do
-          post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
-            name: "comment_only",
-            comment: "can manage workflow from api"
-          }, headers: { "Cookie" => response['Set-Cookie'] }
-        end.to change { work.to_sipity_entity.comments.count }.by(1)
-
-        expect(response.status).to eq(200)
-        json_response = JSON.parse(response.body)
-        expect(json_response['comments'][0]['comment']).to be_present
-        expect(json_response['comments'][0]['updated_at']).to be_present
-        expect(json_response['workflow_status']).to eq 'pending_review'
+        Apartment::Tenant.switch(account.tenant) do
+          expect do
+            post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+              name: "comment_only",
+              comment: "can manage workflow from api"
+            }, headers: { "Cookie" => response['Set-Cookie'] }
+          end.to change { work.reload.to_sipity_entity.comments.count }.by(1)
+          expect(work.reload.to_sipity_entity.comments.count).to eq 1
+          expect(response.status).to eq(200)
+          json_response = JSON.parse(response.body)
+          expect(json_response['comments'][0]['comment']).to be_present
+          expect(json_response['comments'][0]['updated_at']).to be_present
+          expect(json_response['workflow_status']).to eq 'pending_review'
+        end
       end
 
       it 'changes state' do
-        expect do
-          post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
-            name: "approve",
-            comment: "can manage workflow from api"
-          }, headers: { "Cookie" => response['Set-Cookie'] }
-        end.to change { work.to_sipity_entity.reload.workflow_state_name }.from("pending_review").to("deposited")
+        Apartment::Tenant.switch(account.tenant) do
+          expect do
+            post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+              name: "approve",
+              comment: "can manage workflow from api"
+            }, headers: { "Cookie" => response['Set-Cookie'] }
+          end.to change { work.to_sipity_entity.reload.workflow_state_name }.from("pending_review").to("deposited")
 
-        expect(response.status).to eq(200)
-        json_response = JSON.parse(response.body)
-        expect(json_response['comments'][0]['comment']).to be_present
-        expect(json_response['comments'][0]['updated_at']).to be_present
-        expect(json_response['workflow_status']).to eq 'deposited'
+          expect(response.status).to eq(200)
+          json_response = JSON.parse(response.body)
+          expect(json_response['comments'][0]['comment']).to be_present
+          expect(json_response['comments'][0]['updated_at']).to be_present
+          expect(json_response['workflow_status']).to eq 'deposited'
+        end
       end
     end
 
