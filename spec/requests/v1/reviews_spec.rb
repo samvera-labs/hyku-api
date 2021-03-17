@@ -29,6 +29,11 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
       Sipity::Entity.create!(proxy_for_global_id: work.to_global_id.to_s,
                              workflow: work.active_workflow,
                              workflow_state: PowerConverter.convert_to_sipity_workflow_state('pending_review', scope: workflow))
+      post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
+        email: user.email,
+        password: user.password,
+        expire: 2
+      }
     end
   end
 
@@ -39,12 +44,10 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
 
   describe "/reviews" do
     context 'with proper privileges' do
+      let(:user) { approving_user }
+
       before do
-        post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-          email: approving_user.email,
-          password: approving_user.password,
-          expire: 2
-        }
+        Apartment::Tenant.switch(account.tenant) { user }
       end
 
       it "adds comment" do
@@ -57,8 +60,8 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
 
         expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)
-        expect(json_response['data'][0]['comment']).to be_present
-        expect(json_response['data'][0]['updated_at']).to be_present
+        expect(json_response['comments'][0]['comment']).to be_present
+        expect(json_response['comments'][0]['updated_at']).to be_present
         expect(json_response['workflow_status']).to eq 'pending_review'
       end
 
@@ -72,22 +75,17 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
 
         expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)
-        expect(json_response['data'][0]['comment']).to be_present
-        expect(json_response['data'][0]['updated_at']).to be_present
+        expect(json_response['comments'][0]['comment']).to be_present
+        expect(json_response['comments'][0]['updated_at']).to be_present
         expect(json_response['workflow_status']).to eq 'deposited'
       end
     end
 
     context 'without proper privileges' do
-      let(:end_user) { create(:user) }
+      let(:user) { create(:user) }
 
       before do
-        Apartment::Tenant.switch(account.tenant) { end_user }
-        post hyku_api.v1_tenant_users_login_path(tenant_id: account.tenant), params: {
-          email: end_user.email,
-          password: end_user.password,
-          expire: 2
-        }
+        Apartment::Tenant.switch(account.tenant) { user }
       end
 
       it 'returns an error json doc' do
@@ -95,6 +93,59 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
           name: "approve",
           comment: "can manage workflow from api"
         }, headers: { "Cookie" => response['Set-Cookie'] }
+
+        expect(response.status).to eq(200)
+        json_response = JSON.parse(response.body)
+        expect(json_response['status']).to eq(422)
+        expect(json_response['code']).to eq "Unprocessable entity"
+        expect(json_response['code']).to be_present
+      end
+    end
+  end
+
+  describe "/index" do
+    context 'with proper privileges' do
+      let(:user) { approving_user }
+      before do
+        jwt_cookie = response['Set-Cookie']
+        post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+          name: "comment_only",
+          comment: "you can do better!"
+        }, headers: { "Cookie" => jwt_cookie }
+        post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+          name: "approve",
+          comment: "well done!"
+        }, headers: { "Cookie" => jwt_cookie }
+        get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+          page: 2,
+          per: 1
+        }, headers: { "Cookie" => jwt_cookie }
+      end
+
+      it "renders the workflow state" do
+        expect(response.status).to eq(200)
+        json_response = JSON.parse(response.body)
+        expect(json_response['comments'][0]['comment']).to be_present
+        expect(json_response['comments'][0]['updated_at']).to be_present
+        expect(json_response['workflow_status']).to eq 'deposited'
+      end
+
+      it 'paginates and orders the response comments' do
+        json_response = JSON.parse(response.body)
+        expect(json_response['comments'].count).to eq 1
+        expect(json_response['comments'][0]['comment']).to eq 'you can do better!'
+      end
+    end
+
+    context 'without proper privileges' do
+      let(:user) { create(:user) }
+
+      before do
+        Apartment::Tenant.switch(account.tenant) { user }
+      end
+
+      it 'returns an error json doc' do
+        get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {}, headers: { "Cookie" => response['Set-Cookie'] }
 
         expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)

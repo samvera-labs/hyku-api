@@ -9,7 +9,7 @@ Hyku::API::Engine.routes.draw do
             get 'files', to: 'files#index'
             post 'featured_works', to: 'featured_works#create'
             delete 'featured_works', to: 'featured_works#destroy'
-            post 'reviews', to: 'reviews#create'
+            resources :reviews, only: [:create, :index]
           end
         end
         resources :collection, only: [:index, :show], defaults: { format: :json }
