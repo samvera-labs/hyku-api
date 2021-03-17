@@ -29,3 +29,6 @@ Style/GuardClause:
 Naming/AccessorMethodName:
   Exclude:
     - 'app/controllers/hyku/api/v1/sessions_controller.rb'
+Style/BlockDelimiters:
+  Exclude:
+    - 'app/controllers/hyku/api/v1/reviews_controller.rb'
