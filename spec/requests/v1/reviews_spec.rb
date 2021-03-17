@@ -84,10 +84,6 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
     context 'without proper privileges' do
       let(:user) { create(:user) }
 
-      before do
-        Apartment::Tenant.switch(account.tenant) { user }
-      end
-
       it 'returns an error json doc' do
         post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
           name: "approve",
@@ -106,6 +102,7 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
   describe "/index" do
     context 'with proper privileges' do
       let(:user) { approving_user }
+
       before do
         jwt_cookie = response['Set-Cookie']
         post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
@@ -139,10 +136,6 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
 
     context 'without proper privileges' do
       let(:user) { create(:user) }
-
-      before do
-        Apartment::Tenant.switch(account.tenant) { user }
-      end
 
       it 'returns an error json doc' do
         get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {}, headers: { "Cookie" => response['Set-Cookie'] }
