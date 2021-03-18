@@ -15,7 +15,7 @@ module Hyku
           raise Blacklight::Exceptions::RecordNotFound if @response['response']['numFound'].zero?
           @results = @document_list
           @result_count = @response['response']['numFound']
-          @facets = @response['facet_counts']['facet_fields']
+          @facet_counts = @response.aggregations.transform_values { |v| Hash[v.items.pluck(:value, :hits)] }
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "No record found for query_term: #{params[:q]} and filters containing #{params[:f]}" }
         end
@@ -23,7 +23,7 @@ module Hyku
         def facet
           if params[:id] == 'all'
             (@response,) = search_results(params)
-            render json: @response['facet_counts']['facet_fields'].transform_values { |v| Hash[*v] }
+            render json: @response.aggregations.transform_values { |v| Hash[v.items.pluck(:value, :hits)] }
           else
             super
             render json: Hash[@display_facet.items[facet_range].pluck(:value, :hits)]
