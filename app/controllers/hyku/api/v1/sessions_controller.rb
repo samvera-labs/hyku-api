@@ -83,9 +83,15 @@ module Hyku
           end
 
           def user_admin_set_permissions(user)
-            Hyrax::PermissionTemplateAccess.where(agent_id: user.user_key).collect do |pta|
-              { pta.permission_template.admin_set&.title&.first => pta.access }
-            end
+            [Hyrax::PermissionTemplateAccess::MANAGE, Hyrax::PermissionTemplateAccess::DEPOSIT, Hyrax::PermissionTemplateAccess::VIEW].collect do |access_type|
+              Hyrax::PermissionTemplateAccess.for_user(ability: current_ability, access: access_type).collect do |pta|
+                pta_source = pta.permission_template.source_model
+                next unless pta_source&.is_a?(AdminSet)
+                { pta_source.title.first => pta.access }
+              rescue ActiveFedora::ObjectNotFoundError
+                nil
+              end.compact
+            end.flatten.uniq
           end
       end
     end
