@@ -74,7 +74,7 @@ module Hyku
 
           def render_user(user = nil)
             user ||= current_user
-            render json: user.slice(:email).merge(participants: user_admin_set_permissions(user), type: user_roles(user))
+            render json: user.slice(:email).merge(participants: user_admin_set_permissions(current_ability), type: user_roles(user))
           end
 
           def user_roles(user)
@@ -82,9 +82,9 @@ module Hyku
             user.roles.map(&:name).uniq - ['super_admin']
           end
 
-          def user_admin_set_permissions(user)
+          def user_admin_set_permissions(ability)
             [Hyrax::PermissionTemplateAccess::MANAGE, Hyrax::PermissionTemplateAccess::DEPOSIT, Hyrax::PermissionTemplateAccess::VIEW].collect do |access_type|
-              Hyrax::PermissionTemplateAccess.for_user(ability: current_ability, access: access_type).collect do |pta|
+              Hyrax::PermissionTemplateAccess.for_user(ability: ability, access: access_type).collect do |pta|
                 pta_source = pta.permission_template.source_model
                 next unless pta_source&.is_a?(AdminSet)
                 { pta_source.title.first => pta.access }
