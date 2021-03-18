@@ -26,7 +26,7 @@ module Hyku
             builder = Hyrax::CollectionSearchBuilder.new(self)
                                                     .rows(rows)
             response = repository.search(builder)
-            response.documents
+            response.documents.map { |doc| Hyrax::CollectionPresenter.new(doc, current_ability, request) }
           rescue Blacklight::Exceptions::ECONNREFUSED, Blacklight::Exceptions::InvalidRequest
             []
           end
