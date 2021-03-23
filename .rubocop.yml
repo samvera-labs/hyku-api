@@ -14,6 +14,9 @@ Metrics/BlockLength:
     - 'app/views/hyku/api/v1/**/*.json.jbuilder'
     - 'config/routes.rb'
     - 'spec/**/*'
+Metrics/LineLength:
+  Exclude:
+    - 'app/controllers/hyku/api/v1/reviews_controller.rb'
 
 RSpec/ExampleLength:
   Exclude:

@@ -3,11 +3,11 @@ module Hyku
   module API
     module V1
       class ReviewsController < BaseController
-        before_action :check_approval_permissions
         rescue_from ActionController::BadRequest, with: :render_invalid_review
+        before_action :check_approval_permissions, only: :index
 
         def create
-          raise ActionController::BadRequest unless valid_review_action? && perform_review_action
+          raise ActionController::BadRequest unless perform_review_action
           # For some reason need to switch! the current tenant again
           AccountElevator.switch!(@account.cname)
           render_work_approval
@@ -19,21 +19,20 @@ module Hyku
 
         private
 
-          # Assume one step mediated deposit
-          REVIEW_ACTIONS = ['approve', "pending_review", "changes_required", 'comment_only', 'request_changes', 'request_review'].freeze
-
           def work
             @work ||= ActiveFedora::Base.find(params[:id])
           end
 
-          def valid_review_action?
-            params[:name].in?(REVIEW_ACTIONS)
+          def perform_review_action
+            Hyrax::Forms::WorkflowActionForm.new(
+              current_ability: current_ability,
+              work: work,
+              attributes: workflow_action_params
+            ).save
           end
 
-          def perform_review_action
-            subject = Hyrax::WorkflowActionInfo.new(work, current_user)
-            sipity_workflow_action = PowerConverter.convert_to_sipity_action(params[:name], scope: subject.entity.workflow)
-            Hyrax::Workflow::WorkflowActionService.run(subject: subject, action: sipity_workflow_action, comment: params[:comment])
+          def workflow_action_params
+            params.permit(:name, :comment)
           end
 
           def render_work_approval
@@ -57,7 +56,7 @@ module Hyku
           end
 
           def check_approval_permissions
-            raise ActionController::BadRequest unless current_ability.can?(:review, :submissions) || current_ability.can?(:edit, work)
+            raise ActionController::BadRequest unless Hyrax::Workflow::PermissionQuery.scope_permitted_workflow_actions_available_for_current_state(entity: work.to_sipity_entity, user: current_user).any?
           end
       end
     end
