@@ -158,7 +158,7 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
         }, headers: { "Cookie" => response['Set-Cookie'] }
         expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)
-        expect(json_response['workflow_status']).to eq 'pending_review'
+        expect(json_response['workflow_status']).to be_blank
       end
     end
 
