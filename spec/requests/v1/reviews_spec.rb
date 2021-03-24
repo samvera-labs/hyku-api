@@ -100,37 +100,65 @@ RSpec.describe Hyku::API::V1::ReviewsController, type: :request, clean: true, mu
   end
 
   describe "/index" do
-    context 'with proper privileges' do
+    context 'for an approving user' do
       let(:user) { approving_user }
 
-      before do
-        jwt_cookie = response['Set-Cookie']
-        post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
-          name: "comment_only",
-          comment: "you can do better!"
-        }, headers: { "Cookie" => jwt_cookie }
-        post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
-          name: "approve",
-          comment: "well done!"
-        }, headers: { "Cookie" => jwt_cookie }
+      it "returns the workflow status" do
         get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
           page: 2,
-          per: 1
-        }, headers: { "Cookie" => jwt_cookie }
-      end
-
-      it "renders the workflow state" do
+          per_page: 1
+        }, headers: { "Cookie" => response['Set-Cookie'] }
         expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)
-        expect(json_response['comments'][0]['comment']).to be_present
-        expect(json_response['comments'][0]['updated_at']).to be_present
-        expect(json_response['workflow_status']).to eq 'deposited'
+        expect(json_response['workflow_status']).to eq 'pending_review'
       end
 
-      it 'paginates and orders the response comments' do
+      context 'with some comments' do
+        before do
+          jwt_cookie = response['Set-Cookie']
+          post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+            name: "comment_only",
+            comment: "you can do better!"
+          }, headers: { "Cookie" => jwt_cookie }
+          post "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+            name: "approve",
+            comment: "well done!"
+          }, headers: { "Cookie" => jwt_cookie }
+          get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+            page: 2,
+            per_page: 1
+          }, headers: { "Cookie" => jwt_cookie }
+        end
+
+        it "renders the workflow state" do
+          expect(response.status).to eq(200)
+          json_response = JSON.parse(response.body)
+          expect(json_response['comments'][0]['comment']).to be_present
+          expect(json_response['comments'][0]['updated_at']).to be_present
+          expect(json_response['workflow_status']).to eq 'deposited'
+        end
+
+        it 'paginates and orders the response comments' do
+          json_response = JSON.parse(response.body)
+          expect(json_response['comments'].count).to eq 1
+          expect(json_response['comments'][0]['comment']).to eq 'you can do better!'
+          expect(json_response['page']).to eq 2
+          expect(json_response['total_comments']).to eq 2
+        end
+      end
+    end
+
+    context 'for an depositing user' do
+      let(:user) { depositing_user }
+
+      it "returns the workflow status" do
+        get "/api/v1/tenant/#{account.tenant}/work/#{work.id}/reviews", params: {
+          page: 2,
+          per_page: 1
+        }, headers: { "Cookie" => response['Set-Cookie'] }
+        expect(response.status).to eq(200)
         json_response = JSON.parse(response.body)
-        expect(json_response['comments'].count).to eq 1
-        expect(json_response['comments'][0]['comment']).to eq 'you can do better!'
+        expect(json_response['workflow_status']).to be_blank
       end
     end
 

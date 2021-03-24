@@ -37,7 +37,10 @@ module Hyku
 
           def render_work_approval
             sipity_entity = work.to_sipity_entity.reload
+            comments = work_comments_collection(sipity_entity)
             render json: {
+              page: (params[:page].presence || 1).to_i,
+              total_comments: comments.total_count,
               comments: work_comments_collection(sipity_entity).map { |c|
                 { comment: c.comment, updated_at: c.updated_at, email: c.name_of_commentor }
               },
@@ -46,7 +49,7 @@ module Hyku
           end
 
           def work_comments_collection(sipity_entity)
-            sipity_entity.comments.page(params[:page] || 1).per(params[:per] || 10).order(updated_at: :desc)
+            sipity_entity.comments.page(params[:page] || 1).per(params[:per_page] || 10).order(updated_at: :desc)
           end
 
           def render_invalid_review
