@@ -11,6 +11,16 @@ module Hyku
           mount Hyku::API::Engine, at: '/', as: :hyku_api
         end
       end
+
+      def self.dynamically_include_mixins
+        Hyrax::WorkShowPresenter.include Hyku::API::WorkShowPresenterBehavior
+      end
+
+      if Rails.env.development?
+        config.to_prepare { Hyku::API::Engine.dynamically_include_mixins }
+      else
+        config.after_initialize { Hyku::API::Engine.dynamically_include_mixins }
+      end
     end
   end
 end
