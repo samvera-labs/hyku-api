@@ -78,8 +78,13 @@ json.rights_statement work.rights_statement
 #                                         "series_name" => nil,
 json.source work.source
 json.subject work.subject
-# json.thumbnail_base64_string nil
 if work.representative_presenter&.solr_document&.public?
+  json.representative_id work.representative_id
+else
+  json.representative_id nil
+end
+# json.thumbnail_base64_string nil
+if work.thumbnail_presenter&.solr_document&.public?
   components = {
     scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
     host: @account.cname,

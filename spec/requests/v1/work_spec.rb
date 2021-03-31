@@ -442,6 +442,7 @@ RSpec.describe Hyku::API::V1::WorkController, type: :request, clean: true, multi
           before do
             work.ordered_members += [file_with_image]
             work.representative_id = file_with_image.id
+            work.thumbnail_id = file_with_image.id
             work.save!
             # FIXME: collection.thumbnail_path is still the default work icon due to the file not getting a derivative generated
           end
@@ -450,6 +451,7 @@ RSpec.describe Hyku::API::V1::WorkController, type: :request, clean: true, multi
             get "/api/v1/tenant/#{account.tenant}/work/#{work.id}"
             expect(response.status).to eq(200)
             expect(json_response).to include("thumbnail_url" => URI.join("http://#{account.cname}", work.to_solr['thumbnail_path_ss']).to_s)
+            expect(json_response).to include("representative_id" => file_with_image.id)
           end
         end
 
