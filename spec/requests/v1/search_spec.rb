@@ -196,6 +196,26 @@ RSpec.describe Hyku::API::V1::SearchController, type: :request, clean: true, mul
                                          'member_of_collections_ssim' => {})
       end
 
+      context 'with many facet values' do
+        let(:work) { create(:work, visibility: 'open', keyword: ['test', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10', 'test11']) }
+
+        it 'returns all facet value counts without pagination' do
+          get "/api/v1/tenant/#{account.tenant}/search/facet/#{id}"
+          expect(response.status).to eq(200)
+          expect(json_response).to include('keyword_sim' => { "test" => 1,
+                                                              "test2" => 1,
+                                                              "test3" => 1,
+                                                              "test4" => 1,
+                                                              "test5" => 1,
+                                                              "test6" => 1,
+                                                              "test7" => 1,
+                                                              "test8" => 1,
+                                                              "test9" => 1,
+                                                              "test10" => 1,
+                                                              "test11" => 1 })
+        end
+      end
+
       context 'with q' do
         let(:work) { create(:work, visibility: 'open', keyword: ['Cat'], language: ["English"]) }
         let(:work2) { create(:work, visibility: 'open', keyword: ['Dog'], language: ["French"]) }
