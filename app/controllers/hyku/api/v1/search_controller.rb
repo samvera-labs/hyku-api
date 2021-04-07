@@ -23,7 +23,7 @@ module Hyku
         def facet
           if params[:id] == 'all'
             # Set facet.limit to -1 for all facets when sending solr request so all facet values get returned
-            solr_params = search_builder.to_h
+            solr_params = search_builder.with(params).to_h
             solr_params.each_key { |k| solr_params[k] = -1 if k.match?(/^f\..+\.limit$/) }
             @response = repository.search(solr_params)
             render json: @response.aggregations.transform_values { |v| Hash[v.items.pluck(:value, :hits)] }
