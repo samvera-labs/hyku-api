@@ -84,14 +84,11 @@ module Hyku
 
           def user_admin_set_permissions(ability)
             [Hyrax::PermissionTemplateAccess::MANAGE, Hyrax::PermissionTemplateAccess::DEPOSIT, Hyrax::PermissionTemplateAccess::VIEW].collect do |access_type|
-              Hyrax::PermissionTemplateAccess.for_user(ability: ability, access: access_type).collect do |pta|
-                pta_source = pta.permission_template.source_model
-                next unless pta_source&.is_a?(AdminSet)
-                { pta_source.title.first => pta.access }
-              rescue ActiveFedora::ObjectNotFoundError
-                nil
-              end.compact
-            end.flatten.uniq
+              ids = Hyrax::Collections::PermissionsService.send(:admin_set_ids_for_user, access: access_type, ability: ability)
+              next unless ids.present?
+              titles = ActiveFedora::SolrService.get("id:(#{ids.join(' OR ')})", rows: 1_000_000, fl: [:title_tesim])['response']['docs'].pluck('title_tesim').flatten.uniq
+              titles.collect { |title| { title => access_type } }
+            end.flatten.compact
           end
       end
     end
