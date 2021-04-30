@@ -29,6 +29,7 @@ module Hyku
           raise Blacklight::Exceptions::RecordNotFound unless doc.present?
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
+          render json: work_json(@work) and return
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
@@ -79,6 +80,49 @@ module Hyku
           def work_presenter_class(doc)
             model_name = doc.to_model.model_name.name
             "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
+          end
+
+          def work_json(work)
+            {
+              uuid: work.id,
+              abstract: work.description.first,
+              admin_set_name: work.admin_set.first,
+              cname: @account.cname,
+              contributor: work.contributor,
+              creator: work.creator,
+              date_submitted: work.date_uploaded,
+              files: {
+                has_private_files: work.file_set_presenters.any? { |fsp| fsp.solr_document.private? },
+                has_registered_files: work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? },
+                has_public_files: work.file_set_presenters.any? { |fsp| fsp.solr_document.public? }
+              },
+              keywords: work.keyword,
+              language: work.language,
+              license: nil,
+              publisher: work.publisher,
+              related_url: work.related_url,
+              resource_type: work.resource_type,
+              rights_statement: work.rights_statement,
+              source: work.source,
+              subject: work.subject,
+              representative_id: work.representative_presenter&.solr_document&.public? ? work.representative_id : nil,
+              thumbnail_url: work.thumbnail_presenter&.solr_document&.public? ? build_thumbnail_url(work) : nil,
+              title: work.title.first,
+              type: "work",
+              visibility: work.solr_document.visibility,
+              work_type: work.model.model_name.to_s,
+              workflow_status: work.solr_document.workflow_state
+            }
+          end
+
+          def build_thumbnail_url(work)
+            components = {
+              scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
+              host: @account.cname,
+              path: work.solr_document.thumbnail_path.split('?')[0],
+              query: work.solr_document.thumbnail_path.split('?')[1]
+            }
+            URI::Generic.build(components).to_s
           end
       end
     end
