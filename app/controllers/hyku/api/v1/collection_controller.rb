@@ -13,7 +13,10 @@ module Hyku
         end
 
         def index
-          super
+          (@response, @document_list) = HykuAddons::SimpleWorksCache.new(params[:tenant_id]).fetch query: params.permit!.to_h do
+            search_results(params)
+          end
+
           raise Blacklight::Exceptions::RecordNotFound if Collection.count.zero?
           @collections = @document_list.map { |doc| Hyrax::CollectionPresenter.new(doc, current_ability, request) }
           @collection_count = @response['response']['numFound']

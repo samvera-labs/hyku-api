@@ -11,7 +11,10 @@ module Hyku
         copy_blacklight_config_from(::CatalogController)
 
         def index
-          super
+          (@response, @document_list) = HykuAddons::SimpleWorksCache.new(params[:tenant_id]).fetch query: params.permit!.to_h do
+            search_results(params)
+          end
+
           raise Blacklight::Exceptions::RecordNotFound if @response['response']['numFound'].zero?
           @results = @document_list
           @result_count = @response['response']['numFound']
