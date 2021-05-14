@@ -1,2 +1,2 @@
 # frozen_string_literal: true
-json.partial! 'collection', locals: { collection: @collection }
+json.partial! 'collection', locals: { collection: @collection, include_works: true }

@@ -11,11 +11,12 @@ module Hyku
         copy_blacklight_config_from(::CatalogController)
 
         def index
-          (@response, @document_list) = HykuAddons::SimpleWorksCache.new(params[:tenant_id]).fetch query: params.permit!.to_h do
-            search_results(params)
-          end
-
+          super
           raise Blacklight::Exceptions::RecordNotFound if @response['response']['numFound'].zero?
+
+          collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
+          @collection_docs = repository.search(collection_search_builder).documents
+
           @results = @document_list
           @result_count = @response['response']['numFound']
           @facet_counts = @response.aggregations.transform_values { |v| Hash[v.items.pluck(:value, :hits)] }

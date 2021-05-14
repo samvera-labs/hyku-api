@@ -16,9 +16,9 @@ module Hyku
         end
 
         def index
-          (@response, @document_list) = HykuAddons::SimpleWorksCache.new(params[:tenant_id]).fetch query: params.permit!.to_h do
-            search_results(params)
-          end
+          super
+          collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
+          @collection_docs = repository.search(collection_search_builder).documents
 
           raise Blacklight::Exceptions::RecordNotFound if ActiveFedora::Base.where("generic_type_sim:Work").count.zero?
           @works = @document_list.map { |doc| Hyku::WorkShowPresenter.new(doc, current_ability, request) }
@@ -28,18 +28,18 @@ module Hyku
         end
 
         def show
-          doc = HykuAddons::SimpleWorksCache.new(params[:tenant_id]).fetch work: params[:id] do
-            repository.search(single_item_search_builder.query).documents.first
-          end
-
+          doc = repository.search(single_item_search_builder.query).documents.first
           raise Blacklight::Exceptions::RecordNotFound unless doc.present?
+
+          collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
+          @collection_docs = repository.search(collection_search_builder).documents
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
 
-          def manifest
+        def manifest
           @work = repository.search(single_item_search_builder.query).documents.first
           raise Blacklight::Exceptions::RecordNotFound unless @work.present?
 
