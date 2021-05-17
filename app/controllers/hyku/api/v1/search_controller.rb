@@ -13,6 +13,10 @@ module Hyku
         def index
           super
           raise Blacklight::Exceptions::RecordNotFound if @response['response']['numFound'].zero?
+
+          collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
+          @collection_docs = repository.search(collection_search_builder).documents
+
           @results = @document_list
           @result_count = @response['response']['numFound']
           @facet_counts = @response.aggregations.transform_values { |v| Hash[v.items.pluck(:value, :hits)] }

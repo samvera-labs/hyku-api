@@ -15,6 +15,7 @@ module Hyku
         def index
           super
           raise Blacklight::Exceptions::RecordNotFound if Collection.count.zero?
+
           @collections = @document_list.map { |doc| Hyrax::CollectionPresenter.new(doc, current_ability, request) }
           @collection_count = @response['response']['numFound']
         rescue Blacklight::Exceptions::RecordNotFound
@@ -23,9 +24,10 @@ module Hyku
 
         def show
           @collection = collection_presenter
+          raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
+
           @works = authorized_work_presenters
           @total_works = total_authorized_works
-          raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private collection or there is no record with id: #{params[:id]}" }
         end
