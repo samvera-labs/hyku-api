@@ -17,10 +17,10 @@ module Hyku
 
         def index
           super
+          raise Blacklight::Exceptions::RecordNotFound if ActiveFedora::Base.where("generic_type_sim:Work").count.zero?
+
           collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
           @collection_docs = repository.search(collection_search_builder).documents
-
-          raise Blacklight::Exceptions::RecordNotFound if ActiveFedora::Base.where("generic_type_sim:Work").count.zero?
           @works = @document_list.map { |doc| Hyku::WorkShowPresenter.new(doc, current_ability, request) }
           @work_count = @response['response']['numFound']
         rescue Blacklight::Exceptions::RecordNotFound

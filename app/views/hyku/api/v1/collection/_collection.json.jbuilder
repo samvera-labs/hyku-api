@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 # FIXME: many attributes here left nil so specs will pass
-json.cache! [@account.tenant, :collections, collection.id, collection.solr_document[:system_modified_dtsi], local_assigns[:include_works]] do
+json.cache! [@account, :collections, collection.id, collection.solr_document[:_version_]] do
   json.uuid collection.id
   json.cname @account.cname
   json.date_created collection.date_created&.first
@@ -31,10 +31,10 @@ json.cache! [@account.tenant, :collections, collection.id, collection.solr_docum
   json.visibility collection.visibility
   json.volumes nil
   json.total_works @total_works
+end
 
-  if local_assigns[:include_works]
-    json.works do
-      json.partial! 'hyku/api/v1/work/work', collection: @works, as: :work, collection_docs: Array.wrap(@collection_member_search_results)
-    end
+if local_assigns[:include_works]
+  json.works do
+    json.partial! 'hyku/api/v1/work/work', collection: @works, as: :work, collection_docs: Array.wrap(@collection_member_search_results)
   end
 end
