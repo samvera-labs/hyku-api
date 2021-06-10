@@ -177,6 +177,21 @@ RSpec.describe Hyku::API::V1::SearchController, type: :request, clean: true, mul
         end
       end
     end
+
+    context 'when solr throws an exception' do
+      before do
+        allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('production'))
+        allow_any_instance_of(Hyku::API::V1::SearchController).to receive(:search_results).and_raise(Blacklight::Exceptions::InvalidRequest)
+      end
+
+      it 'returns json 500' do
+        get "/api/v1/tenant/#{account.tenant}/search"
+        expect(response.status).to eq(500)
+        expect(json_response['message']).to be_present
+        expect(json_response['code']).to eq 'Search error'
+        expect(json_response['status']).to eq 500
+      end
+    end
   end
 
   describe "/search/facet/:id" do

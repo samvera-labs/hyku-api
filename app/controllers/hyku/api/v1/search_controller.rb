@@ -3,9 +3,7 @@ module Hyku
   module API
     module V1
       class SearchController < BaseController
-        include Blacklight::Controller
-        include Hydra::Catalog
-        include Hydra::Controller::ControllerBehavior
+        include Hyku::API::V1::SearchBehavior
 
         include Blacklight::Configurable
         copy_blacklight_config_from(::CatalogController)

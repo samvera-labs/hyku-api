@@ -267,6 +267,8 @@ GEM
     diff-lcs (1.4.4)
     docile (1.3.2)
     docopt (0.5.0)
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
     draper (4.0.1)
       actionpack (>= 5.0)
       activemodel (>= 5.0)
@@ -361,6 +363,9 @@ GEM
     fcrepo_wrapper (0.9.0)
       ruby-progressbar
     ffi (1.13.1)
+    ffi-compiler (1.0.1)
+      ffi (>= 1.0.0)
+      rake
     flipflop (2.6.0)
       activesupport (>= 4.0)
     flot-rails (0.0.7)
@@ -399,6 +404,14 @@ GEM
     hiredis (0.6.3)
     honeybadger (3.3.1)
     htmlentities (4.3.4)
+    http (5.0.0)
+      addressable (~> 2.3)
+      http-cookie (~> 1.0)
+      http-form_data (~> 2.2)
+      llhttp-ffi (~> 0.0.1)
+    http-cookie (1.0.4)
+      domain_name (~> 0.5)
+    http-form_data (2.3.0)
     http_logger (0.6.0)
     httpclient (2.8.3)
     hydra-access-controls (11.0.6)
@@ -607,6 +620,9 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
+    llhttp-ffi (0.0.1)
+      ffi-compiler (~> 1.0)
+      rake (~> 13.0)
     lograge (0.11.2)
       actionpack (>= 4)
       activesupport (>= 4)
@@ -902,8 +918,8 @@ GEM
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
     slop (4.8.2)
-    solr_wrapper (2.2.0)
-      faraday
+    solr_wrapper (3.1.2)
+      http
       retriable
       ruby-progressbar
       rubyzip
@@ -968,6 +984,9 @@ GEM
     uber (0.1.0)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.7)
     unicode-display_width (1.7.0)
     validatable (1.6.7)
     warden (1.2.9)
@@ -1056,7 +1075,7 @@ DEPENDENCIES
   selenium-webdriver
   sidekiq
   simplecov
-  solr_wrapper (~> 2.0)
+  solr_wrapper (>= 3.1.2)
   spring (~> 1.7)
   spring-watcher-listen (~> 2.0.0)
   tether-rails
