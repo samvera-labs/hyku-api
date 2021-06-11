@@ -35,3 +35,7 @@ Naming/AccessorMethodName:
 Style/BlockDelimiters:
   Exclude:
     - 'app/controllers/hyku/api/v1/reviews_controller.rb'
+
+RSpec/AnyInstance:
+  Exclude:
+    - 'spec/requests/v1/search_spec.rb'

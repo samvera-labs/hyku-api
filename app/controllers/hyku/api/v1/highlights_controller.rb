@@ -3,9 +3,7 @@ module Hyku
   module API
     module V1
       class HighlightsController < BaseController
-        include Blacklight::Controller
-        include Hydra::Catalog
-        include Hydra::Controller::ControllerBehavior
+        include Hyku::API::V1::SearchBehavior
 
         configure_blacklight do |config|
           config.search_builder_class = Hyrax::HomepageSearchBuilder

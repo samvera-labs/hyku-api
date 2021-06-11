@@ -3,9 +3,7 @@ module Hyku
   module API
     module V1
       class FilesController < BaseController
-        include Blacklight::Controller
-        include Hydra::Catalog
-        include Hydra::Controller::ControllerBehavior
+        include Hyku::API::V1::SearchBehavior
 
         def index
           @files = authorized_file_set_presenters
