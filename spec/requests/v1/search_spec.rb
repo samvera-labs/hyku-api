@@ -199,20 +199,31 @@ RSpec.describe Hyku::API::V1::SearchController, type: :request, clean: true, mul
 
     context 'all facets' do
       let(:work) { create(:work, visibility: 'open', keyword: ['test'], language: ['English']) }
+      let(:another_work) { create(:work, visibility: 'open', keyword: ['test', 'test2'], language: ['Basque']) }
       let(:id) { 'all' }
+
+      before do
+        Apartment::Tenant.switch(account.tenant) { another_work }
+      end
 
       it 'returns facet information' do
         get "/api/v1/tenant/#{account.tenant}/search/facet/#{id}"
         expect(response.status).to eq(200)
-        expect(json_response).to include('keyword_sim' => { "test" => 1 },
-                                         'language_sim' => { "English" => 1 },
-                                         'human_readable_type_sim' => { "Work" => 1 },
+        expect(json_response).to include('keyword_sim' => { "test" => 2, "test2" => 1 },
+                                         'language_sim' => { "English" => 1, "Basque" => 1 },
+                                         'human_readable_type_sim' => { "Work" => 2 },
                                          'resource_type_sim' => {},
                                          'member_of_collections_ssim' => {})
       end
 
+      it "returns the result ordered by hits" do
+        get "/api/v1/tenant/#{account.tenant}/search/facet/#{id}"
+        expect(response.status).to eq(200)
+        expect(json_response['keyword_sim'].to_a).to eq({ "test" => 2, "test2" => 1 }.to_a)
+      end
+
       context 'with many facet values' do
-        let(:work) { create(:work, visibility: 'open', keyword: ['test', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10', 'test11']) }
+        let(:work) { create(:work, visibility: 'open', keyword: ['test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10', 'test11']) }
 
         it 'returns all facet value counts without pagination' do
           get "/api/v1/tenant/#{account.tenant}/search/facet/#{id}"

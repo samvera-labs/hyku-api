@@ -28,10 +28,10 @@ module Hyku
             solr_params = search_builder.with(params).to_h
             solr_params.each_key { |k| solr_params[k] = -1 if k.match?(/^f\..+\.limit$/) }
             @response = repository.search(solr_params)
-            render json: @response.aggregations.transform_values { |v| Hash[v.items.pluck(:value, :hits)] }
+            render json: @response.aggregations.transform_values { |v| hash_of_terms_ordered_by_hits(v.items) }
           else
             super
-            render json: Hash[@display_facet.items[facet_range].pluck(:value, :hits)]
+            render json: hash_of_terms_ordered_by_hits(@display_facet.items[facet_range])
           end
         end
 
@@ -47,6 +47,10 @@ module Hyku
 
           def facet_range
             facet_offset..(facet_offset + facet_limit - 1)
+          end
+
+          def hash_of_terms_ordered_by_hits(items)
+            Hash[items.pluck(:value, :hits).sort_by(&:second).reverse]
           end
       end
     end
