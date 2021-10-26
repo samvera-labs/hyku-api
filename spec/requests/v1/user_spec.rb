@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-RSpec.describe Hyku::API::V1::WorkController, type: :request, clean: true, multitenant: true do
+RSpec.describe Hyku::API::V1::UserController, type: :request, clean: true, multitenant: true do
   let(:account) { create(:account) }
   let(:user) { create(:user) }
 
@@ -19,7 +19,7 @@ RSpec.describe Hyku::API::V1::WorkController, type: :request, clean: true, multi
     Apartment::Tenant.drop(account.tenant)
   end
 
-  describe "/work" do
+  describe "/user" do
     let(:json_response) { JSON.parse(response.body) }
 
     context "when looking for a registered user" do
