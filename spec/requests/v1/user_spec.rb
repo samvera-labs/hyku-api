@@ -31,5 +31,4 @@ RSpec.describe Hyku::API::V1::WorkController, type: :request, clean: true, multi
       end
     end
   end
-
 end
