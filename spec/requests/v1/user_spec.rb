@@ -32,7 +32,7 @@ RSpec.describe Hyku::API::V1::UserController, type: :request, clean: true, multi
 
       it "returns error when there is no user" do
         get "/api/v1/tenant/#{account.tenant}/user/#{user.id + 1}"
-        expect(json_response).to include('message' => "Couldn't find user with 'id' #{params[:id]}")
+        expect(json_response).to include('message' => "Couldn't find user with 'id' #{user.id + 1}")
       end
     end
   end
