@@ -14,7 +14,6 @@ json.department user.department
 json.title user.title
 json.office user.office
 json.chat_id user.chat_id
-json.department user.department
 json.title user.title
 json.office user.office
 json.chat_id user.chat_id
