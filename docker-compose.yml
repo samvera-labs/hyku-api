@@ -19,7 +19,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: DEVELOPMENT_IMAGE
+      target: development_image
     image: hyku-api/development_image:latest
     environment: &web_environment
       HOST: "0.0.0.0" # Docker cannot forward to a containers localhost, so we need to use this IP instead
