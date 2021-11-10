@@ -3,6 +3,10 @@ module Hyku
   module API
     module V1
       class UserController < BaseController
+        def index
+          @users = User.all
+        end
+
         def show
           @user = User.find(params[:id])
         rescue ActiveRecord::RecordNotFound

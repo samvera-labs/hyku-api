@@ -74,6 +74,9 @@ RSpec.describe 'REST API V1 Routing', type: :routing do
           it "routes to show via GET" do
             expect(get: "/api/v1/tenant/abc/user/def").to route_to("hyku/api/v1/user#show", tenant_id: 'abc', id: 'def', format: :json)
           end
+          it "routes to index via GET" do
+            expect(get: "/api/v1/tenant/abc/user").to route_to("hyku/api/v1/user#index", tenant_id: 'abc', id: 'def', format: :json)
+          end
         end
 
         describe 'collection routes' do
