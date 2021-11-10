@@ -1,5 +1,5 @@
 # Base stage for building final images
-FROM phusion/passenger-ruby27:2.0.0 as BASE_IMAGE
+FROM phusion/passenger-ruby27:2.0.0 as base_image
 
 RUN install_clean --allow-unauthenticated \
 	sendmail \
@@ -31,7 +31,7 @@ RUN mkdir -p /opt/fits && \
 		chmod +X /opt/fits/fits.sh
 
 # Entry point from the docker-compose - last stage as Docker works backwards
-FROM BASE_IMAGE as DEVELOPMENT_IMAGE
+FROM base_image as development_image
 
 WORKDIR /home/app
 
