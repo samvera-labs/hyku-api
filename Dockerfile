@@ -28,7 +28,7 @@ RUN apt clean \
 RUN mkdir -p /opt/fits && \
     curl -fSL -o /opt/fits/fits-latest.zip https://projects.iq.harvard.edu/files/fits/files/fits-1.3.0.zip && \
     cd /opt/fits && unzip fits-latest.zip && \
-		chmod +X /opt/fits/fits.sh
+    chmod +X /opt/fits/fits.sh
 
 # Entry point from the docker-compose - last stage as Docker works backwards
 FROM base_image as development_image
