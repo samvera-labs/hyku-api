@@ -1,0 +1,16 @@
+.circleci
+.coveralls.yml
+docker-compose.yml
+Dockerfile
+Dockerfile.base
+.env
+.fcrepo_wrapper
+.git
+.gitmodules
+.gitignore
+.hound.yml
+LICENSE
+README.md
+.rspec
+.rubocop.yml
+.solargraph.yml
