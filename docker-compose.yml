@@ -33,7 +33,7 @@ services:
       LD_LIBRARY_PATH: /opt/fits/tools/mediainfo/linux
       RAILS_LOG_TO_STDOUT: "true"
       REDIS_HOST: redis
-      # SECRET_KEY_BASE: asdf
+      SECRET_KEY_BASE: asdf
       SETTINGS__SOLR__URL: http://solr:8983/solr/
       SETTINGS__ZOOKEEPER__CONNECTION_STR: zookeeper_cluster:2181/configs
       SOLR_URL: http://solr:8983/solr/

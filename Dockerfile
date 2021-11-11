@@ -18,6 +18,7 @@ RUN install_clean --allow-unauthenticated \
 	zip \
 	unzip \
 	gnupg2 \
+	ffmpeg \
 	vim
 
 RUN apt clean \
