@@ -30,9 +30,9 @@ RSpec.describe Hyku::API::V1::UserController, type: :request, clean: true, multi
       it "returns a list of all users" do
         get "/api/v1/tenant/#{account.tenant}/user"
         expect(json_response['total']).to eq(3)
-        expect(json_response['items']).to include(a_hash_including("id"=> user.id))
-        expect(json_response['items']).to include(a_hash_including("id"=> user2.id))
-        expect(json_response['items']).to include(a_hash_including("id"=> user3.id))
+        expect(json_response['items']).to include(a_hash_including("id" => user.id))
+        expect(json_response['items']).to include(a_hash_including("id" => user2.id))
+        expect(json_response['items']).to include(a_hash_including("id" => user3.id))
       end
       it "returns user JSON when a user is found" do
         get "/api/v1/tenant/#{account.tenant}/user/#{user.id}"
@@ -42,11 +42,11 @@ RSpec.describe Hyku::API::V1::UserController, type: :request, clean: true, multi
       end
     end
 
-      context "when there are no registered users" do
-        it "returns error when there is no user" do
-          get "/api/v1/tenant/#{account.tenant}/user/#{user.id + 42}"
-          expect(json_response['error']).to include('message' => "Couldn't find user with 'id' #{user.id + 42}")
-        end
+    context "when there are no registered users" do
+      it "returns error when there is no user" do
+        get "/api/v1/tenant/#{account.tenant}/user/#{user.id + 42}"
+        expect(json_response['error']).to include('message' => "Couldn't find user with 'id' #{user.id + 42}")
+      end
     end
   end
 end
