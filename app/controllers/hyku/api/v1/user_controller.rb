@@ -5,6 +5,7 @@ module Hyku
       class UserController < BaseController
         def index
           @users = User.all
+          @user_count = @users.count
         end
 
         def show
