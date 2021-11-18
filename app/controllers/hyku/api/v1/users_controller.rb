@@ -2,7 +2,7 @@
 module Hyku
   module API
     module V1
-      class UserController < BaseController
+      class UsersController < BaseController
         def index
           @users = User.all
           @user_count = @users.count

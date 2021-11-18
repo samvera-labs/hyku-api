@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-RSpec.describe Hyku::API::V1::UserController, type: :request, clean: true, multitenant: true do
+RSpec.describe Hyku::API::V1::UsersController, type: :request, clean: true, multitenant: true do
   let(:account) { create(:account) }
   let(:user) { create(:user) }
   let(:user2) { create(:user) }
@@ -28,23 +28,23 @@ RSpec.describe Hyku::API::V1::UserController, type: :request, clean: true, multi
 
     context "when there are registered users" do
       it "returns a list of all users" do
-        get "/api/v1/tenant/#{account.tenant}/user"
+        get "/api/v1/tenant/#{account.tenant}/users"
         expect(json_response['total']).to eq(3)
         expect(json_response['items']).to include(a_hash_including("id" => user.id))
         expect(json_response['items']).to include(a_hash_including("id" => user2.id))
         expect(json_response['items']).to include(a_hash_including("id" => user3.id))
       end
       it "returns user JSON when a user is found" do
-        get "/api/v1/tenant/#{account.tenant}/user/#{user.id}"
+        get "/api/v1/tenant/#{account.tenant}/users/#{user.id}"
         expect(response.status).to eq(200)
         expect(json_response['id']).to eq user.id
-        expect(response).to render_template('api/v1/user/_user')
+        expect(response).to render_template('api/v1/users/_user')
       end
     end
 
     context "when there are no registered users" do
       it "returns error when there is no user" do
-        get "/api/v1/tenant/#{account.tenant}/user/#{user.id + 42}"
+        get "/api/v1/tenant/#{account.tenant}/users/#{user.id + 42}"
         expect(json_response['error']).to include('message' => "Couldn't find user with 'id' #{user.id + 42}")
       end
     end
