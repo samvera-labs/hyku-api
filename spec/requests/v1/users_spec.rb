@@ -34,6 +34,7 @@ RSpec.describe Hyku::API::V1::UsersController, type: :request, clean: true, mult
         expect(json_response['items']).to include(a_hash_including("id" => user2.id))
         expect(json_response['items']).to include(a_hash_including("id" => user3.id))
       end
+
       it "returns user JSON when a user is found" do
         get "/api/v1/tenant/#{account.tenant}/users/#{user.id}"
         expect(response.status).to eq(200)
