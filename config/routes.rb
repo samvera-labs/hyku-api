@@ -3,6 +3,7 @@ Hyku::API::Engine.routes.draw do
   scope 'api' do
     namespace :v1 do
       resources :tenant, only: [:index, :show], defaults: { format: :json } do
+        resources :users, only: [:index, :show], defaults: { format: :json }
         resources :work, only: [:index, :show], defaults: { format: :json } do
           member do
             get 'manifest'

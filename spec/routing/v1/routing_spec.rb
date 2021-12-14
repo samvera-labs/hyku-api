@@ -18,7 +18,7 @@ RSpec.describe 'REST API V1 Routing', type: :routing do
       describe "work" do
         describe 'RESTful routes' do
           it "routes to #index via GET" do
-            expect(get: "/api/v1/tenant/abc/work").to route_to("hyku/api/v1/work#index", tenant_id: 'abc', format: :json)
+            expect(get: "/api/v1/tenant/abc/work").to route_to("hyku/api/v1/work#index", format: :json, tenant_id: 'abc')
           end
           it "routes to #show via GET" do
             expect(get: "/api/v1/tenant/abc/work/def").to route_to("hyku/api/v1/work#show", id: 'def', tenant_id: 'abc', format: :json)
@@ -70,6 +70,15 @@ RSpec.describe 'REST API V1 Routing', type: :routing do
       end
 
       describe 'users' do
+        describe 'RESTful routes' do
+          it "routes to show via GET" do
+            expect(get: "/api/v1/tenant/abc/users/def").to route_to("hyku/api/v1/users#show", tenant_id: 'abc', id: 'def', format: :json)
+          end
+          it "routes to index via GET" do
+            expect(get: "/api/v1/tenant/abc/users").to route_to("hyku/api/v1/users#index", tenant_id: 'abc', format: :json)
+          end
+        end
+
         describe 'collection routes' do
           it "routes to #login via POST" do
             expect(post: "/api/v1/tenant/abc/users/login").to route_to("hyku/api/v1/sessions#create", tenant_id: 'abc', format: :json)
