@@ -3,6 +3,8 @@ module Hyku
   module API
     module V1
       class UsersController < BaseController
+        include Hyku::API::V1::SearchBehavior
+
         def index
           @users = User.all
           @user_count = @users.count
