@@ -5,6 +5,10 @@ module Hyku
       class UsersController < BaseController
         include Hyku::API::V1::SearchBehavior
 
+        configure_blacklight do |config|
+          config.search_builder_class = Hyku::API::WorksSearchBuilder
+        end
+
         def index
           @users = User.all
           @user_count = @users.count
