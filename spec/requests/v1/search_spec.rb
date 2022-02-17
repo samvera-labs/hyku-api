@@ -209,7 +209,7 @@ RSpec.describe Hyku::API::V1::SearchController, type: :request, clean: true, mul
       it 'returns facet information' do
         get "/api/v1/tenant/#{account.tenant}/search/facet/#{id}"
         expect(response.status).to eq(200)
-        expect(json_response).to include('keyword_sim' => { "test" => 2, "test2" => 1 },
+        expect(json_response).to include('keyword_sim' => { "testa" => 1, "testb" => 2 },
                                          'language_sim' => { "English" => 1, "Basque" => 1 },
                                          'human_readable_type_sim' => { "Work" => 2 },
                                          'resource_type_sim' => {},
@@ -219,7 +219,7 @@ RSpec.describe Hyku::API::V1::SearchController, type: :request, clean: true, mul
       it "returns the result ordered by hits" do
         get "/api/v1/tenant/#{account.tenant}/search/facet/#{id}"
         expect(response.status).to eq(200)
-        expect(json_response['keyword_sim'].to_a).to eq({ "test" => 2, "test2" => 1 }.to_a)
+        expect(json_response['keyword_sim'].to_a).to eq({ "testb" => 2, "testa" => 1 }.to_a)
       end
 
       context 'with many facet values' do
