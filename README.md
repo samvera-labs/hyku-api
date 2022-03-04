@@ -444,7 +444,7 @@ An individual work might look as follows:
 
 #### Manifest
 
-http://repofrontend.hyku.docker:3000/api/v1/tenant/0b199b49-8f52-4725-b9c0-3c4c78f2c58c/work/5ffa54bc-20d6-4bd8-9e15-cbc326bdf787/manifest
+`/api/v1/tenant/0b199b49-8f52-4725-b9c0-3c4c78f2c58c/work/5ffa54bc-20d6-4bd8-9e15-cbc326bdf787/manifest`
 
 ```json
 {
