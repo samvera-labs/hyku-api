@@ -198,8 +198,8 @@ RSpec.describe Hyku::API::V1::SearchController, type: :request, clean: true, mul
     let(:json_response) { JSON.parse(response.body) }
 
     context 'all facets' do
-      let(:work) { create(:work, visibility: 'open', keyword: ['test'], language: ['English']) }
-      let(:another_work) { create(:work, visibility: 'open', keyword: ['test', 'test2'], language: ['Basque']) }
+      let(:work) { create(:work, visibility: 'open', keyword: ['testb'], language: ['English']) }
+      let(:another_work) { create(:work, visibility: 'open', keyword: ['testa', 'testb'], language: ['Basque']) }
       let(:id) { 'all' }
 
       before do
@@ -209,7 +209,7 @@ RSpec.describe Hyku::API::V1::SearchController, type: :request, clean: true, mul
       it 'returns facet information' do
         get "/api/v1/tenant/#{account.tenant}/search/facet/#{id}"
         expect(response.status).to eq(200)
-        expect(json_response).to include('keyword_sim' => { "testa" => 1, "testb" => 2 },
+        expect(json_response).to include('keyword_sim' => { "testb" => 2, "testa" => 1 },
                                          'language_sim' => { "English" => 1, "Basque" => 1 },
                                          'human_readable_type_sim' => { "Work" => 2 },
                                          'resource_type_sim' => {},
@@ -223,22 +223,22 @@ RSpec.describe Hyku::API::V1::SearchController, type: :request, clean: true, mul
       end
 
       context 'with many facet values' do
-        let(:work) { create(:work, visibility: 'open', keyword: ['test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10', 'test11']) }
+        let(:work) { create(:work, visibility: 'open', keyword: ['testc', 'testd', 'teste', 'testf', 'testg', 'testh', 'testi', 'testj', 'testk']) }
 
         it 'returns all facet value counts without pagination' do
           get "/api/v1/tenant/#{account.tenant}/search/facet/#{id}"
           expect(response.status).to eq(200)
-          expect(json_response).to include('keyword_sim' => { "test" => 1,
-                                                              "test2" => 1,
-                                                              "test3" => 1,
-                                                              "test4" => 1,
-                                                              "test5" => 1,
-                                                              "test6" => 1,
-                                                              "test7" => 1,
-                                                              "test8" => 1,
-                                                              "test9" => 1,
-                                                              "test10" => 1,
-                                                              "test11" => 1 })
+          expect(json_response).to include('keyword_sim' => { "testa" => 1,
+                                                              "testb" => 1,
+                                                              "testc" => 1,
+                                                              "testd" => 1,
+                                                              "teste" => 1,
+                                                              "testf" => 1,
+                                                              "testg" => 1,
+                                                              "testh" => 1,
+                                                              "testi" => 1,
+                                                              "testj" => 1,
+                                                              "testk" => 1 })
         end
       end
 
