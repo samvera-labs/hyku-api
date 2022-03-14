@@ -662,6 +662,3 @@ An individual work might look as follows:
 ```
 
 Other routes can be explored via the `config/routes.rb` file. 
-
-## License
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
