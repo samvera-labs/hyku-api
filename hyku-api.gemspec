@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.name        = "hyku-api"
   spec.version     = Hyku::API::VERSION
   spec.authors     = ["Chris Colvard"]
-  spec.email       = ["chris.colvard@gmail.com"]
+  spec.email       = ["tech@ubiquitypress.com", "chris.colvard@gmail.com"]
   spec.homepage    = ""
   spec.summary     = "Limited API for Hyku backend"
   spec.description = "Hyku::API defines a limited API abstracted from Hyku's controller endpoints to be used in the building of custom front ends."
