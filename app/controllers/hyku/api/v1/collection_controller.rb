@@ -46,9 +46,19 @@ module Hyku
             collection_member_search_results.total
           end
 
-          def collection_member_search_results
-            @collection_member_search_results ||= Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
-          end
+        def collection_member_search_results
+          @collection_member_search_results ||=
+            class_exists?('CollectionMemberSearchService') ?
+              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_works :
+              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
+        end
+
+        def class_exists?(class_name)
+          klass = Hyrax::Collections.const_get(class_name)
+          klass.is_a?(Class)
+        rescue NameError
+          false
+        end
 
           def collection_presenter
             return nil if collection_document.nil?
