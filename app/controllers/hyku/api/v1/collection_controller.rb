@@ -47,10 +47,14 @@ module Hyku
           end
 
           def collection_member_search_results
-            if @collection_member_search_results ||= class_exists?('CollectionMemberSearchService')
-              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_works
+            if class_exists?('CollectionMemberSearchService')
+              @collection_member_search_results ||=
+                Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params)
+                                                                 .available_member_works
             else
-              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
+              @collection_member_search_results ||=
+                Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params)
+                                                           .available_member_works
             end
           end
 
