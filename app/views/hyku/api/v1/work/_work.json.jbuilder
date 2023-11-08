@@ -76,6 +76,11 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   json.resource_type work.resource_type
   #                                         "review_data" => nil,
   #                                         "rights_holder" => nil,
+  json.related_publication_citation work.related_publication_citation
+  json.methodology_collection_method work.methodology_collection_method
+  json.programming_language work.programming_language
+  json.attendees work.attendees
+  json.mentor work.mentor
   json.rights_statement work.rights_statement
   #                                         "series_name" => nil,
   json.source work.source
