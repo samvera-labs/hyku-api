@@ -38,3 +38,9 @@ if local_assigns[:include_works]
     json.partial! 'hyku/api/v1/work/work', collection: @works, as: :work, collection_docs: Array.wrap(@collection_member_search_results)
   end
 end
+
+if local_assigns[:include_collections]
+  json.collections do
+    json.partial! 'hyku/api/v1/collection/collection', collection: @collections, as: :collection, collection_docs: Array.wrap(@collection_member_search_results)
+  end
+end
