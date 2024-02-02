@@ -40,7 +40,7 @@ if local_assigns[:include_works]
 end
 
 if local_assigns[:include_collections]
-  json.child_collections do
+  json.collections do
     json.partial! 'hyku/api/v1/collection/collection', collection: @child_collections, as: :collection, collection_docs: Array.wrap(@collection_child_collection_search_results)
   end
 end
