@@ -24,20 +24,44 @@ module Hyku
           @collection = collection_presenter
           raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
 
+          @child_collections = authorized_child_collection_presenters
           @works = authorized_work_presenters
           @total_works = total_authorized_works
+          @child_collections = total_authorized_child_collections
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private collection or there is no record with id: #{params[:id]}" }
         end
 
         private
 
+        def authorized_child_collection_presenters
+          return nil if collection_presenter.nil?
+          child_collection_documents = collection_child_collection_search_results.documents
+          child_collection_documents.map do |doc|
+            presenter_class = work_presenter_class(doc)
+            presenter_class.new(doc, current_ability, request)
+          end
+        end
+
+        def total_authorized_child_collections
+          return 0 if collection_presenter.nil?
+          collection_child_collection_search_results.total
+        end
+
+        def collection_child_collection_search_results
+          @collection_child_collection_search_results ||=
+            if class_exists?('CollectionMemberSearchService')
+              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+            else
+              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+            end
+        end
+
           def authorized_work_presenters
             return nil if collection_presenter.nil?
             work_documents = collection_member_search_results.documents
-            work_documents.map do |doc|
-              presenter_class = work_presenter_class(doc)
-              presenter_class.new(doc, current_ability, request)
+            work_documents.each do |doc|
+              collection_presenter.new(doc, current_ability, request)
             end
           end
 
