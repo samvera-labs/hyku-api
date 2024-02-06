@@ -51,7 +51,7 @@ module Hyku
 
         def collection_parent_collection_search_results
           @collection_parent_collection_search_results ||=
-            Hyrax::Collections::NestedCollectionQueryService.parent_collections(child: collection_presenter, scope: self, page: page)
+            Hyrax::Collections::NestedCollectionQueryService.parent_collections(child: collection_presenter, scope: self, page: 1)
         end
 
         def authorized_child_collection_presenters
