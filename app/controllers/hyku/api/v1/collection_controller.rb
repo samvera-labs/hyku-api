@@ -37,7 +37,7 @@ module Hyku
         def authorized_child_collection_presenters
           return nil if collection_presenter.nil?
           child_collection_documents = collection_child_collection_search_results.documents
-          work_documents.each do |doc|
+          child_collection_documents.each do |doc|
             collection_presenter.new(doc, current_ability, request)
           end
         end
