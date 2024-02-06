@@ -46,12 +46,12 @@ module Hyku
 
         def total_authorized_parent_collections
           return 0 if collection_presenter.nil?
-          collection_parent_collection_search_results.count
+          collection_parent_collection_search_results.total
         end
 
         def collection_parent_collection_search_results
           @collection_parent_collection_search_results ||=
-            Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+            Hyrax::Collections::NestedCollectionQueryService.parent_collections(child: collection_presenter, scope: self, page: page)
         end
 
         def authorized_child_collection_presenters
