@@ -38,7 +38,7 @@ module Hyku
           return nil if collection_presenter.nil?
           child_collection_documents = collection_child_collection_search_results.documents
           child_collection_documents.each do |doc|
-            collection_presenter.new(doc, current_ability, request)
+            Hyrax::CollectionPresenter.new(doc, current_ability, request)
           end
         end
 
