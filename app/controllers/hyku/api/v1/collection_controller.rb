@@ -37,9 +37,8 @@ module Hyku
         def authorized_child_collection_presenters
           return nil if collection_presenter.nil?
           child_collection_documents = collection_child_collection_search_results.documents
-          child_collection_documents.map do |doc|
-            presenter_class = work_presenter_class(doc)
-            presenter_class.new(doc, current_ability, request)
+          work_documents.each do |doc|
+            collection_presenter.new(doc, current_ability, request)
           end
         end
 
@@ -57,13 +56,14 @@ module Hyku
             end
         end
 
-          def authorized_work_presenters
-            return nil if collection_presenter.nil?
-            work_documents = collection_member_search_results.documents
-            work_documents.each do |doc|
-              collection_presenter.new(doc, current_ability, request)
-            end
+        def authorized_work_presenters
+          return nil if collection_presenter.nil?
+          work_documents = collection_member_search_results.documents
+          work_documents.map do |doc|
+            presenter_class = work_presenter_class(doc)
+            presenter_class.new(doc, current_ability, request)
           end
+        end
 
           def total_authorized_works
             return 0 if collection_presenter.nil?
