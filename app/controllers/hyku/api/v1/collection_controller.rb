@@ -24,15 +24,35 @@ module Hyku
           @collection = collection_presenter
           raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
 
+          @parent_collections = authorized_parent_collection_presenters
           @child_collections = authorized_child_collection_presenters
           @works = authorized_work_presenters
           @total_works = total_authorized_works
+          @total_parent_collections = total_authorized_parent_collections
           @total_child_collections = total_authorized_child_collections
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private collection or there is no record with id: #{params[:id]}" }
         end
 
         private
+
+        def authorized_parent_collection_presenters
+          return nil if collection_presenter.nil?
+          parent_collection_documents = collection_parent_collection_search_results.documents
+          parent_collection_documents.each do |doc|
+            Hyrax::CollectionPresenter.new(doc, current_ability, request)
+          end
+        end
+
+        def total_authorized_parent_collections
+          return 0 if collection_presenter.nil?
+          collection_parent_collection_search_results.total
+        end
+
+        def collection_parent_collection_search_results
+          @collection_parent_collection_search_results ||=
+            Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(parent: collection, scope: controller, limit_to_id: nil)
+        end
 
         def authorized_child_collection_presenters
           return nil if collection_presenter.nil?
