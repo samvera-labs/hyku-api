@@ -41,11 +41,6 @@ module Hyku
           collection_parent_collection_search_results
         end
 
-        def total_authorized_parent_collections
-          return 0 if collection_presenter.nil?
-          collection_parent_collection_search_results.count
-        end
-
         def collection_parent_collection_search_results
           @collection_parent_collection_search_results ||=
             Hyrax::Collections::NestedCollectionQueryService
