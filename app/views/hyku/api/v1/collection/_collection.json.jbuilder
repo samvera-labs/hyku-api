@@ -32,7 +32,7 @@ json.cache! [@account, :collections, collection.id, collection.solr_document[:_v
   json.volumes nil
   json.total_works @total_works
   json.total_subcollections @total_child_collections
-  json.parent_collections @parent_collections
+  #json.parent_collections @parent_collections
 end
 
 if local_assigns[:include_works]

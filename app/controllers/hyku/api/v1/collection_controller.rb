@@ -24,7 +24,7 @@ module Hyku
           @collection = collection_presenter
           raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
 
-          @parent_collections = authorized_parent_collection_presenters
+          # @parent_collections = authorized_parent_collection_presenters
           @child_collections = authorized_child_collection_presenters
           @works = authorized_work_presenters
           @total_works = total_authorized_works
@@ -35,19 +35,23 @@ module Hyku
 
         private
 
-        def authorized_parent_collection_presenters
-          return nil if collection_presenter.nil?
-          collection_parent_collection_search_results
-        end
+        #-------------------- Parent collections ------------------------------------
 
-        def collection_parent_collection_search_results
-          @collection_parent_collection_search_results ||=
-            Hyrax::Collections::NestedCollectionQueryService
-              .available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
-              .map do |result|
-              { "id" => result.id, "title_first" => result.title.first }
-            end.to_json
-        end
+        # def authorized_parent_collection_presenters
+        #   return nil if collection_presenter.nil?
+        #   collection_parent_collection_search_results
+        # end
+
+        # def collection_parent_collection_search_results
+        #   @collection_parent_collection_search_results ||=
+        #     Hyrax::Collections::NestedCollectionQueryService
+        #       .available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+        #       .map do |result|
+        #       { "id" => result.id, "title_first" => result.title.first }
+        #     end.to_json
+        # end
+
+        #---------------------- child collections -----------------------------------
 
         def authorized_child_collection_presenters
           return nil if collection_presenter.nil?
@@ -62,6 +66,7 @@ module Hyku
           collection_child_collection_search_results.total
         end
 
+        #----------------------- work ---------------------------------------
         def collection_child_collection_search_results
           @collection_child_collection_search_results ||=
             if class_exists?('CollectionMemberSearchService')
