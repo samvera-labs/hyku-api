@@ -50,9 +50,8 @@ module Hyku
         end
 
         def collection_parent_collection_search_results
-          page = params[:parent_collection_page].to_i
-          query = Hyrax::Collections::NestedCollectionQueryService
-          @collection_parent_collection_search_results ||= query.parent_collections(child: collection_presenter, scope: self, page: page)
+          @collection_parent_collection_search_results ||=
+            Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
         end
 
         def authorized_child_collection_presenters
