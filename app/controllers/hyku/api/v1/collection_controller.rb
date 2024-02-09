@@ -51,7 +51,11 @@ module Hyku
 
         def collection_parent_collection_search_results
           @collection_parent_collection_search_results ||=
-            Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+            Hyrax::Collections::NestedCollectionQueryService
+              .available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+              .map do |result|
+              { "id" => result.id, "title_first" => result.title.first }
+            end.to_json
         end
 
         def authorized_child_collection_presenters
