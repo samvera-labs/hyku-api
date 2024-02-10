@@ -25,7 +25,7 @@ module Hyku
           raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
 
           # @parent_collections = authorized_parent_collection_presenters
-          @child_collections = authorized_subcollection_presenters
+          # @child_collections = authorized_subcollection_presenters
           @works = authorized_work_presenters
           @total_works = total_authorized_works
           @total_child_collections = total_authorized_subcollections
@@ -102,27 +102,27 @@ module Hyku
 
         #---------------------------------Subcollections --------------------------
 
-        def authorized_subcollection_presenters
-          return nil if collection_presenter.nil?
-          subcollection_documents = collection_subcollection_search_results.documents
-          subcollection_documents.map do |doc|
-            Hyrax::CollectionPresenter.new(doc, current_ability, request)
-          end
-        end
-
-        def total_authorized_subcollections
-          return 0 if collection_presenter.nil?
-          collection_subcollection_search_results.total
-        end
-
-        def collection_subcollection_search_results
-          @collection_subcollection_search_results ||=
-            if class_exists?('CollectionMemberSearchService')
-              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-            else
-              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-            end
-        end
+        # def authorized_subcollection_presenters
+        #   return nil if collection_presenter.nil?
+        #   subcollection_documents = collection_subcollection_search_results.documents
+        #   subcollection_documents.map do |doc|
+        #     Hyrax::CollectionPresenter.new(doc, current_ability, request)
+        #   end
+        # end
+        #
+        # def total_authorized_subcollections
+        #   return 0 if collection_presenter.nil?
+        #   collection_subcollection_search_results.total
+        # end
+        #
+        # def collection_subcollection_search_results
+        #   @collection_subcollection_search_results ||=
+        #     if class_exists?('CollectionMemberSearchService')
+        #       Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+        #     else
+        #       Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+        #     end
+        # end
 
         #=============================================
 
