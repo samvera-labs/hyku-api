@@ -31,8 +31,13 @@ json.cache! [@account, :collections, collection.id, collection.solr_document[:_v
   json.visibility collection.visibility
   json.volumes nil
   json.total_works @total_works
-  json.total_subcollections @total_child_collections
-  json.parent_collections @parent_collections
+  # json.total_subcollections @total_child_collections
+  json.total_parent_collections @total_parent_collections
+end
+if local_assigns[:include_works]
+  json.parent_collections do
+    json.partial! 'hyku/api/v1/collection/collection', collection: @parent_collections, as: :parent_collection, collection_docs: Array.wrap(@parent_collection_search_results)
+  end
 end
 
 if local_assigns[:include_works]

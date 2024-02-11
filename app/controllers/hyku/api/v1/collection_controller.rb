@@ -25,6 +25,7 @@ module Hyku
           raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
 
           @parent_collections = authorized_parent_collection_presenters
+          @total_parent_collections = total_authorized_parent_collections
           # @child_collections = authorized_subcollection_presenters
           # @total_child_collections = total_authorized_subcollections
           @works = authorized_work_presenters
@@ -39,21 +40,22 @@ module Hyku
 
         def authorized_parent_collection_presenters
           return nil if collection_presenter.nil?
-          collection_parent_collection_search_results
-          # parent_collection_documents.map do |doc|
-          #   Hyrax::CollectionPresenter.new(doc, current_ability, request)
-          # end
+          parent_collection_documents = parent_collection_search_results.documents
+          parent_collection_documents.map do |doc|
+            Hyrax::CollectionPresenter.new(doc, current_ability, request)
+          end
         end
 
-        def collection_parent_collection_search_results
-          @collection_parent_collection_search_results ||=
-            Hyrax::Collections::NestedCollectionQueryService
-              .available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
-              .map do |result|
-              { "id" => result.id, "title_first" => result.title.first }
-            end.to_json
+        def total_authorized_parent_collections
+          return 0 if collection_presenter.nil?
+          collection_presenter.parent_collections.count
         end
 
+        def parent_collection_search_results
+          @parent_collection_search_results ||= collection_presenter.parent_collections
+        end
+
+        #-------------------- Work collections ------------------------------------
         def authorized_work_presenters
           return nil if collection_presenter.nil?
           work_documents = collection_member_search_results.documents
@@ -63,46 +65,46 @@ module Hyku
           end
         end
 
-          def total_authorized_works
-            return 0 if collection_presenter.nil?
-            collection_member_search_results.total
-          end
+        def total_authorized_works
+          return 0 if collection_presenter.nil?
+          collection_member_search_results.total
+        end
 
-          def collection_member_search_results
-            @collection_member_search_results ||=
-              if class_exists?('CollectionMemberSearchService')
-                Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_works
-              else
-                Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
-              end
-          end
+        def collection_member_search_results
+          @collection_member_search_results ||=
+            if class_exists?('CollectionMemberSearchService')
+              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_works
+            else
+              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
+            end
+        end
 
-          def class_exists?(class_name)
-            klass = Hyrax::Collections.const_get(class_name)
-            klass.is_a?(Class)
-          rescue NameError
-            false
-          end
+        def class_exists?(class_name)
+          klass = Hyrax::Collections.const_get(class_name)
+          klass.is_a?(Class)
+        rescue NameError
+          false
+        end
 
-          def collection_presenter
-            return nil if collection_document.nil?
-            @collection_presenter ||= Hyrax::CollectionPresenter.new(collection_document, current_ability, request)
-          end
+        def collection_presenter
+          return nil if collection_document.nil?
+          @collection_presenter ||= Hyrax::CollectionPresenter.new(collection_document, current_ability, request)
+        end
 
-          def collection_document
-            @collection_document ||= repository.search(single_item_search_builder.query).documents.first
-          end
+        def collection_document
+          @collection_document ||= repository.search(single_item_search_builder.query).documents.first
+        end
 
-          # Instantiates the search builder that builds a query for a single item
-          # this is useful in the show view.
-          def single_item_search_builder
-            Hyrax::SingleCollectionSearchBuilder.new(self).with(params.except(:q, :page))
-          end
+        # Instantiates the search builder that builds a query for a single item
+        # this is useful in the show view.
+        def single_item_search_builder
+          Hyrax::SingleCollectionSearchBuilder.new(self).with(params.except(:q, :page))
+        end
 
-          def work_presenter_class(doc)
-            model_name = doc.to_model.model_name.name
-            "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
-          end
+        def work_presenter_class(doc)
+          model_name = doc.to_model.model_name.name
+          "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
+        end
       end
     end
   end
