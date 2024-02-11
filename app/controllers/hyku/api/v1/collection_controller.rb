@@ -53,27 +53,27 @@ module Hyku
 
         #---------------------- child collections -----------------------------------
 
-        def authorized_child_collection_presenters
-          return nil if collection_presenter.nil?
-          child_collection_documents = collection_child_collection_search_results.documents
-          child_collection_documents.each do |doc|
-            Hyrax::CollectionPresenter.new(doc, current_ability, request)
-          end
-        end
-
-        def total_authorized_child_collections
-          return 0 if collection_presenter.nil?
-          collection_child_collection_search_results.total
-        end
-
-        def collection_child_collection_search_results
-          @collection_child_collection_search_results ||=
-            if class_exists?('CollectionMemberSearchService')
-              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-            else
-              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-            end
-        end
+        # def authorized_child_collection_presenters
+        #   return nil if collection_presenter.nil?
+        #   child_collection_documents = collection_child_collection_search_results.documents
+        #   child_collection_documents.each do |doc|
+        #     Hyrax::CollectionPresenter.new(doc, current_ability, request)
+        #   end
+        # end
+        #
+        # def total_authorized_child_collections
+        #   return 0 if collection_presenter.nil?
+        #   collection_child_collection_search_results.total
+        # end
+        #
+        # def collection_child_collection_search_results
+        #   @collection_child_collection_search_results ||=
+        #     if class_exists?('CollectionMemberSearchService')
+        #       Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+        #     else
+        #       Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+        #     end
+        # end
 
         #----------------------- work ---------------------------------------
 
@@ -102,27 +102,27 @@ module Hyku
 
         #---------------------------------Subcollections --------------------------
 
-        # def authorized_subcollection_presenters
-        #   return nil if collection_presenter.nil?
-        #   subcollection_documents = collection_subcollection_search_results.documents
-        #   subcollection_documents.map do |doc|
-        #     Hyrax::CollectionPresenter.new(doc, current_ability, request)
-        #   end
-        # end
-        #
-        # def total_authorized_subcollections
-        #   return 0 if collection_presenter.nil?
-        #   collection_subcollection_search_results.total
-        # end
-        #
-        # def collection_subcollection_search_results
-        #   @collection_subcollection_search_results ||=
-        #     if class_exists?('CollectionMemberSearchService')
-        #       Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-        #     else
-        #       Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-        #     end
-        # end
+        def authorized_subcollection_presenters
+          return nil if collection_presenter.nil?
+          subcollection_documents = collection_subcollection_search_results.documents
+          subcollection_documents.map do |doc|
+            Hyrax::CollectionPresenter.new(doc, current_ability, request)
+          end
+        end
+
+        def total_authorized_subcollections
+          return 0 if collection_presenter.nil?
+          collection_subcollection_search_results.total
+        end
+
+        def collection_subcollection_search_results
+          @collection_subcollection_search_results ||=
+            if class_exists?('CollectionMemberSearchService')
+              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+            else
+              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+            end
+        end
 
         #=============================================
 
