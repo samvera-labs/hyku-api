@@ -48,11 +48,11 @@ module Hyku
 
         def total_authorized_parent_collections
           return 0 if collection_presenter.nil?
-          collection_presenter.parent_collections.count
+          @collection_presenter.parent_collections.count
         end
 
         def parent_collection_search_results
-          @parent_collection_search_results ||= collection_presenter.parent_collections
+          @parent_collection_search_results ||= @collection_presenter.parent_collections
         end
 
         #-------------------- Work collections ------------------------------------
