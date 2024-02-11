@@ -24,11 +24,11 @@ module Hyku
           @collection = collection_presenter
           raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
 
-          # @parent_collections = authorized_parent_collection_presenters
-          @child_collections = authorized_subcollection_presenters
+          @parent_collections = authorized_parent_collection_presenters
+          # @child_collections = authorized_subcollection_presenters
+          # @total_child_collections = total_authorized_subcollections
           @works = authorized_work_presenters
           @total_works = total_authorized_works
-          @total_child_collections = total_authorized_subcollections
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private collection or there is no record with id: #{params[:id]}" }
         end
@@ -37,45 +37,19 @@ module Hyku
 
         #-------------------- Parent collections ------------------------------------
 
-        # def authorized_parent_collection_presenters
-        #   return nil if collection_presenter.nil?
-        #   collection_parent_collection_search_results
-        # end
+        def authorized_parent_collection_presenters
+          return nil if collection_presenter.nil?
+          collection_parent_collection_search_results
+        end
 
-        # def collection_parent_collection_search_results
-        #   @collection_parent_collection_search_results ||=
-        #     Hyrax::Collections::NestedCollectionQueryService
-        #       .available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
-        #       .map do |result|
-        #       { "id" => result.id, "title_first" => result.title.first }
-        #     end.to_json
-        # end
-
-        #---------------------- child collections -----------------------------------
-
-        # def authorized_child_collection_presenters
-        #   return nil if collection_presenter.nil?
-        #   child_collection_documents = collection_child_collection_search_results.documents
-        #   child_collection_documents.each do |doc|
-        #     Hyrax::CollectionPresenter.new(doc, current_ability, request)
-        #   end
-        # end
-        #
-        # def total_authorized_child_collections
-        #   return 0 if collection_presenter.nil?
-        #   collection_child_collection_search_results.total
-        # end
-        #
-        # def collection_child_collection_search_results
-        #   @collection_child_collection_search_results ||=
-        #     if class_exists?('CollectionMemberSearchService')
-        #       Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-        #     else
-        #       Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-        #     end
-        # end
-
-        #----------------------- work ---------------------------------------
+        def collection_parent_collection_search_results
+          @collection_parent_collection_search_results ||=
+            Hyrax::Collections::NestedCollectionQueryService
+              .available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+              .map do |result|
+              { "id" => result.id, "title_first" => result.title.first }
+            end.to_json
+        end
 
         def authorized_work_presenters
           return nil if collection_presenter.nil?
@@ -99,32 +73,6 @@ module Hyku
                 Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
               end
           end
-
-        #---------------------------------Subcollections --------------------------
-
-        def authorized_subcollection_presenters
-          return nil if collection_presenter.nil?
-          subcollection_documents = collection_subcollection_search_results.documents
-          subcollection_documents.map do |doc|
-            Hyrax::CollectionPresenter.new(doc, current_ability, request)
-          end
-        end
-
-        def total_authorized_subcollections
-          return 0 if collection_presenter.nil?
-          collection_subcollection_search_results.total
-        end
-
-        def collection_subcollection_search_results
-          @collection_subcollection_search_results ||=
-            if class_exists?('CollectionMemberSearchService')
-              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-            else
-              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-            end
-        end
-
-        #=============================================
 
           def class_exists?(class_name)
             klass = Hyrax::Collections.const_get(class_name)
