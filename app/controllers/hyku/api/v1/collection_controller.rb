@@ -48,16 +48,12 @@ module Hyku
 
         def total_authorized_parent_collections
           return 0 if collection_presenter.nil?
-          parent_collection_search_results.count
+          parent_collection_search_results.total
         end
 
         def parent_collection_search_results
           @parent_collection_search_results ||=
-            if class_exists?('CollectionMemberSearchService')
-              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).parent_collections
-            else
-              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).parent_collections
-            end
+            Hyrax::Collections::NestedCollectionQueryService.parent_collections(child: collection_presenter, scope: self, page: page)
         end
 
         #-------------------- Work collections ------------------------------------
