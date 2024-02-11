@@ -28,7 +28,7 @@ module Hyku
           # @child_collections = authorized_subcollection_presenters
           @works = authorized_work_presenters
           @total_works = total_authorized_works
-          @total_child_collections = total_authorized_subcollections
+          # @total_child_collections = total_authorized_subcollections
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private collection or there is no record with id: #{params[:id]}" }
         end
