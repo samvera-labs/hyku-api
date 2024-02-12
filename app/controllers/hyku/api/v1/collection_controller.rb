@@ -26,8 +26,8 @@ module Hyku
 
           @available_parent_collections = authorized_parent_collection_presenters
           @total_parent_collections = total_authorized_parent_collections
-          # @child_collections = authorized_subcollection_presenters
-          # @total_child_collections = total_authorized_subcollections
+          @child_collections = authorized_sub_collection_presenters
+          @total_child_collections = total_authorized_sub_collections
           @works = authorized_work_presenters
           @total_works = total_authorized_works
         rescue Blacklight::Exceptions::RecordNotFound
@@ -54,6 +54,29 @@ module Hyku
         def parent_collection_search_results
           @parent_collection_search_results ||=
             Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+        end
+
+        #-------------------- Child collections ------------------------------------
+        def authorized_sub_collection_presenters
+          return nil if collection_presenter.nil?
+          sub_collection_documents = collection_sub_collection_search_results.documents
+          sub_collection_documents.map do |doc|
+            Hyrax::CollectionPresenter.new(doc, current_ability, request)
+          end
+        end
+
+        def total_authorized_sub_collections
+          return 0 if collection_presenter.nil?
+          collection_sub_collection_search_results.total
+        end
+
+        def collection_sub_collection_search_results
+          @collection_sub_collection_search_results ||=
+            if class_exists?('CollectionMemberSearchService')
+              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+            else
+              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
+            end
         end
 
         #-------------------- Work collections ------------------------------------
