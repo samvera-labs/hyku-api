@@ -53,11 +53,10 @@ module Hyku
         end
 
         def parent_collection_search_results
-          puts "LOG_collection" + @collection.inspect
-          puts "LOG_collection_presenter" + collection_presenter.inspect
-          puts "LOG_collection.parent_collections" + @collection.parent_collections.inspect
-          return [] unless @collection
-          @parent_collection_search_results ||= @collection.parent_collections
+          parent_from_nested_search = Hyrax::Collections::NestedCollectionQueryService.parent_collections(child: collection_presenter, scope: self)
+          puts "LOG_parent_from_nested_search" + parent_from_nested_search.inspect
+          @parent_collection_search_results ||= parent_from_nested_search
+
         end
 
         #-------------------- Child collections ------------------------------------
