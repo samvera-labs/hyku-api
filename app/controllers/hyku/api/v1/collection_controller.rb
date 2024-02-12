@@ -53,8 +53,8 @@ module Hyku
         end
 
         def parent_collection_search_results
-          return [] unless collection_presenter
-          @parent_collection_search_results ||= collection_presenter.parent_collections
+          return [] unless @collection
+          @parent_collection_search_results ||= @collection.parent_collections
         end
 
         #-------------------- Child collections ------------------------------------
