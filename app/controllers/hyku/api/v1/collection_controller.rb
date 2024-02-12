@@ -48,7 +48,7 @@ module Hyku
 
         def total_authorized_parent_collections
           return 0 if collection_presenter.nil?
-          parent_collection_search_results.total
+          parent_collection_search_results.count
         end
 
         def parent_collection_search_results
