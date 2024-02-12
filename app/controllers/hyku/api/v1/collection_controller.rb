@@ -41,6 +41,7 @@ module Hyku
         def authorized_parent_collection_presenters
           return nil if collection_presenter.nil?
           parent_collections = parent_collection_search_results
+          puts "LOG_parent_collections" + parent_collections.inspect
           @available_parent_collections = parent_collections.map do |col|
             { "id" => col.id, "title_first" => col.title.first }
           end.to_json
@@ -60,6 +61,7 @@ module Hyku
         def authorized_sub_collection_presenters
           return nil if collection_presenter.nil?
           sub_collection_documents = collection_sub_collection_search_results.documents
+          puts "LOG_sub_collection_documents" + sub_collection_documents.inspect
           sub_collection_documents.map do |doc|
             Hyrax::CollectionPresenter.new(doc, current_ability, request)
           end
