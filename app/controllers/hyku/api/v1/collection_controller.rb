@@ -24,7 +24,7 @@ module Hyku
           @collection = collection_presenter
           raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
 
-          @parent_collections = authorized_parent_collection_presenters
+          @available_parent_collections = authorized_parent_collection_presenters
           @total_parent_collections = total_authorized_parent_collections
           # @child_collections = authorized_subcollection_presenters
           # @total_child_collections = total_authorized_subcollections
