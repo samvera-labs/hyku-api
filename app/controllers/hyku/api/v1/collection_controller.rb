@@ -53,7 +53,7 @@ module Hyku
         end
 
         def parent_collection_search_results
-          parent_from_nested_search = Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+          parent_from_nested_search = Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(child: collection_presenter, scope: controller, limit_to_id: nil)
           puts "LOG_parent_from_nested_search" + parent_from_nested_search.inspect
           @parent_collection_search_results ||= parent_from_nested_search
 
