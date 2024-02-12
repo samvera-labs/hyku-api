@@ -53,13 +53,7 @@ module Hyku
 
         def parent_collection_search_results
           @parent_collection_search_results ||=
-            if class_exists?('CollectionMemberSearchService')
-              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_parent_collections
-            else
-              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_parent_collections
-            end
-          # @parent_collection_search_results ||=
-          #   Hyrax::Collections::NestedCollectionQueryService.parent_collections(child: collection_presenter, scope: self)
+            Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
         end
 
         #-------------------- Work collections ------------------------------------
