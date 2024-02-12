@@ -40,10 +40,10 @@ module Hyku
 
         def authorized_parent_collection_presenters
           return nil if collection_presenter.nil?
-          parent_collection_documents = parent_collection_search_results.documents
-          parent_collection_documents.map do |doc|
-            Hyrax::CollectionPresenter.new(doc, current_ability, request)
-          end
+          parent_collections = parent_collection_search_results
+          @available_parent_collections = parent_collections.map do |col|
+            { "id" => col.id, "title_first" => col.title.first }
+          end.to_json
         end
 
         def total_authorized_parent_collections
