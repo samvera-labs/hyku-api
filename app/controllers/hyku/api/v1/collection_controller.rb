@@ -53,8 +53,8 @@ module Hyku
         end
 
         def parent_collection_search_results
-          @parent_collection_search_results ||=
-            Hyrax::Collections::NestedCollectionQueryService.available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+          return [] unless collection_presenter
+          @parent_collection_search_results ||= collection_presenter.parent_collections
         end
 
         #-------------------- Child collections ------------------------------------
