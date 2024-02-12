@@ -55,7 +55,8 @@ module Hyku
         end
 
         def parent_collection_search_results
-          parent_from_nested_search = self.available_parent_collections_data(collection: collection_presenter)
+          stub_controller = Class.new { extend Hyrax::CollectionsHelper }.new
+          parent_from_nested_search = stub_controller.available_parent_collections_data(collection: collection_presenter)
           puts "LOG_parent_from_nested_search" + parent_from_nested_search.inspect
           @parent_collection_search_results ||= parent_from_nested_search
 
