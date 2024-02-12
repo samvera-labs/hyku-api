@@ -54,7 +54,7 @@ module Hyku
         def parent_collection_search_results
           page = params[:parent_collection_page].to_i
           @parent_collection_search_results ||=
-            Hyrax::Collections::NestedCollectionQueryService.parent_collections(child: collection_presenter, scope: self, page: page)
+            Hyrax::Collections::NestedCollectionQueryService.parent_collections(child: collection_presenter, scope: self)
         end
 
         #-------------------- Work collections ------------------------------------
