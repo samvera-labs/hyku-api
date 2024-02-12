@@ -1,9 +1,11 @@
 # frozen_string_literal: true
+require 'hyrax/collections_helper'
 module Hyku
   module API
     module V1
       class CollectionController < BaseController
         include Hyku::API::V1::SearchBehavior
+        include Hyrax::CollectionsHelper
 
         # self.search_builder Hyrax::CollectionSearchBuilder
         configure_blacklight do |config|
@@ -53,7 +55,7 @@ module Hyku
         end
 
         def parent_collection_search_results
-          parent_from_nested_search = Hyrax::CollectionsHelper.available_parent_collections_data(collection: collection_presenter)
+          parent_from_nested_search = available_parent_collections_data(collection: collection_presenter)
           puts "LOG_parent_from_nested_search" + parent_from_nested_search.inspect
           @parent_collection_search_results ||= parent_from_nested_search
 
