@@ -53,6 +53,9 @@ module Hyku
         end
 
         def parent_collection_search_results
+          puts "LOG_collection" + @collection.inspect
+          puts "LOG_collection_presenter" + collection_presenter.inspect
+          puts "LOG_collection.parent_collections" + @collection.parent_collections.inspect
           return [] unless @collection
           @parent_collection_search_results ||= @collection.parent_collections
         end
