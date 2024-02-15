@@ -56,7 +56,7 @@ module Hyku
         end
 
         def controller
-          Hyrax::CollectionController
+          self
         end
 
         def parent_collection_search_results
