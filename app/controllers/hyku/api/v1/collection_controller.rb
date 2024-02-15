@@ -59,7 +59,7 @@ module Hyku
         end
 
         def parent_collection_search_results
-          parent_from_nested_search = JSON.parse(available_parent_collections_data(collection: collection_presenter))
+          parent_from_nested_search = collection_presenter.available_parent_collections(self)
           puts "LOG_parent_from_nested_search" + parent_from_nested_search.inspect
           @parent_collection_search_results ||= parent_from_nested_search
         end
