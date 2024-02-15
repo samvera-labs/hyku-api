@@ -44,9 +44,10 @@ module Hyku
           return nil if collection_presenter.nil?
           parent_collections = parent_collection_search_results
           puts "LOG_parent_collections" + parent_collections.inspect
-          @available_parent_collections = parent_collections.map do |col|
-            { "id" => col.id, "title_first" => col.title.first }
-          end.to_json
+          @available_parent_collections = parent_collections
+          # @available_parent_collections = parent_collections.map do |col|
+          #   { "id" => col.id, "title_first" => col.title.first }
+          # end.to_json
         end
 
         def total_authorized_parent_collections
@@ -59,7 +60,7 @@ module Hyku
         end
 
         def parent_collection_search_results
-          parent_from_nested_search = collection_presenter.available_parent_collections(scope: self)
+          parent_from_nested_search = JSON.parse(available_parent_collections_data(collection: collection_presenter))
           puts "LOG_parent_from_nested_search" + parent_from_nested_search.inspect
           @parent_collection_search_results ||= parent_from_nested_search
         end
