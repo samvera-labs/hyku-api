@@ -56,12 +56,11 @@ module Hyku
         end
 
         def controller
-          self
+          Hyrax::CollectionController
         end
 
         def parent_collection_search_results
           puts "LOG_collection_presenter_at_line_63" + collection_presenter.inspect
-          puts "LOG_member_of_collection_ids_at_line_64" + collection_presenter.member_of_collection_ids.inspect
           parent_from_nested_search = JSON.parse(available_parent_collections_data(collection: collection_presenter))
           puts "LOG_parent_from_nested_search" + parent_from_nested_search.inspect
           @parent_collection_search_results ||= parent_from_nested_search
