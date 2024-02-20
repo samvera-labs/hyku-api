@@ -62,7 +62,6 @@ module Hyku
         def parent_collection_search_results
           puts "LOG_collection_presenter_at_line_63" + collection_presenter.inspect
           @parent_collection_search_results ||= JSON.parse(available_parent_collections_data(collection: collection_presenter))
-          puts "LOG_@parent_collection_search_results_at_line_65" + @parent_collection_search_results.inspect
         end
 
         #-------------------- Child collections ------------------------------------
