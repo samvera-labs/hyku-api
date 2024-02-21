@@ -60,10 +60,8 @@ module Hyku
         end
 
         def parent_collection_search_results
-          query = Hyrax::Collections::NestedCollectionQueryService
-          parents = query.parent_collections(child: collection_presenter, scope: self, page: 1)
-          puts "LOG_parent_at_line_63" + parents.inspect
-          @parent_collection_search_results ||= parents
+          puts "LOG_collection_presenter_at_line_63" + collection_presenter.inspect
+          @parent_collection_search_results ||= JSON.parse(available_parent_collections_data(collection: collection_presenter))
         end
 
         #-------------------- Child collections ------------------------------------
