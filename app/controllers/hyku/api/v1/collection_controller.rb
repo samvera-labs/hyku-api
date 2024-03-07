@@ -1,11 +1,9 @@
 # frozen_string_literal: true
-require 'hyrax/collections_helper'
 module Hyku
   module API
     module V1
       class CollectionController < BaseController
         include Hyku::API::V1::SearchBehavior
-        include Hyrax::CollectionsHelper
 
         # self.search_builder Hyrax::CollectionSearchBuilder
         configure_blacklight do |config|
@@ -55,13 +53,16 @@ module Hyku
           parent_collection_search_results.count
         end
 
-        def controller
-          self
-        end
+        # def controller
+        #   self
+        # end
 
         def parent_collection_search_results
-          puts "LOG_collection_presenter_at_line_63" + collection_presenter.inspect
-          @parent_collection_search_results ||= JSON.parse(available_parent_collections_data(collection: collection_presenter))
+          puts "LOG_self_as_scope" + self.inspect
+          @parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
+                                                  .available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+
+          #@parent_collection_search_results ||= JSON.parse(available_parent_collections_data(collection: collection_presenter))
         end
 
         #-------------------- Child collections ------------------------------------
