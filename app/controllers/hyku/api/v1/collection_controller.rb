@@ -7,7 +7,7 @@ module Hyku
 
         # self.search_builder Hyrax::CollectionSearchBuilder
         configure_blacklight do |config|
-          config.search_builder_class = Hyrax::CollectionMemberSearchBuilder
+          config.search_builder_class = Hyku::API::CollectionMemberSearchBuilder
         end
 
         def index
