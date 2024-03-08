@@ -42,10 +42,10 @@ module Hyku
           return nil if collection_presenter.nil?
           parent_collections = parent_collection_search_results
           puts "LOG_parent_collections" + parent_collections.inspect
-          #@parent_collections = parent_collections
-          @parent_collections = parent_collections.map do |col|
-            { "id" => col.id, "title_first" => col.title.first }
-          end.to_json
+          @parent_collections = parent_collections
+          # @available_parent_collections = parent_collections.map do |col|
+          #   { "id" => col.id, "title_first" => col.title.first }
+          # end.to_json
         end
 
         def total_authorized_parent_collections
