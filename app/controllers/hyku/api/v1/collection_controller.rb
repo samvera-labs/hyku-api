@@ -41,7 +41,7 @@ module Hyku
         def authorized_parent_collection_presenters
           return nil if collection_presenter.nil?
           parent_collections_json_data = parent_collection_search_results
-          puts "LOG_parent_collections" + parent_collections.inspect
+          puts "LOG_parent_collections" + parent_collections_json_data.inspect
           # @parent_collections = parent_collections
           docs = parent_collections_json_data.dig('response', 'docs')
           docs.map do |doc|
