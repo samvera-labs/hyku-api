@@ -4,6 +4,7 @@ module Hyku
     module V1
       class CollectionController < BaseController
         include Hyku::API::V1::SearchBehavior
+        include Hyrax::CollectionsHelper
 
         # self.search_builder Hyrax::CollectionSearchBuilder
         configure_blacklight do |config|
