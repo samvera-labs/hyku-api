@@ -7,7 +7,7 @@ module Hyku
 
         # self.search_builder Hyrax::CollectionSearchBuilder
         configure_blacklight do |config|
-          config.search_builder_class = Hyku::API::CollectionMemberSearchBuilder
+          config.search_builder_class = Hyrax::CollectionMemberSearchBuilder
         end
 
         def index
@@ -58,9 +58,9 @@ module Hyku
         # end
 
         def parent_collection_search_results
-          puts "LOG_HYRAX_USE_SOLR_GRAPH_NESTING" + ENV['HYRAX_USE_SOLR_GRAPH_NESTING']
+          puts "LOG_HYRAX_USE_SOLR_GRAPH_NESTING " + ENV['HYRAX_USE_SOLR_GRAPH_NESTING']
           @parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
-                                                  .available_parent_collections(child: collection_presenter, scope: self, limit_to_id: nil)
+                                                  .parent_collections(child: collection_presenter, scope: self, page: 1)
 
           #@parent_collection_search_results ||= JSON.parse(available_parent_collections_data(collection: collection_presenter))
         end
