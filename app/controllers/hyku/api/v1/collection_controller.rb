@@ -42,12 +42,13 @@ module Hyku
           return nil if collection_presenter.nil?
           parent_collections_json_data = parent_collection_search_results
           puts "LOG_parent_collections" + parent_collections_json_data.inspect
-          # @parent_collections = parent_collections
-          document_list = parent_collections_json_data.dig('response', 'docs')
-          data = document_list.map do |doc|
-            { "id" => doc['id'], "title" => doc.dig('title_tesim', 0) }
-          end
-          JSON.pretty_generate(data)
+
+          @parent_collections = parent_collections_json_data
+          # document_list = parent_collections_json_data.dig('response', 'docs')
+          # data = document_list.map { |doc| {
+          #   "id" => doc['id'], "title" => doc.dig('title_tesim', 0) }
+          # }
+          # JSON.parse(JSON.pretty_generate(data))
         end
 
         def total_authorized_parent_collections
@@ -61,10 +62,10 @@ module Hyku
 
         def parent_collection_search_results
           puts "LOG_collection_presenter_solr_document - " + collection_presenter.solr_document.inspect
-          @parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
-                                                  .parent_collections(child: collection_presenter.solr_document, scope: self, page: 1)
+          #@parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
+          #.parent_collections(child: collection_presenter.solr_document, scope: self, page: 1)
 
-          #@parent_collection_search_results ||= JSON.parse(available_parent_collections_data(collection: collection_presenter))
+          @parent_collection_search_results ||= JSON.parse(available_parent_collections_data(collection: collection_presenter.solr_document))
         end
 
         #-------------------- Child collections ------------------------------------
