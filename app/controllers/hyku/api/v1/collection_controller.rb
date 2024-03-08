@@ -24,7 +24,7 @@ module Hyku
           @collection = collection_presenter
           raise Blacklight::Exceptions::RecordNotFound unless @collection.present?
 
-          @available_parent_collections = authorized_parent_collection_presenters
+          @parent_collections = authorized_parent_collection_presenters
           @total_parent_collections = total_authorized_parent_collections
           @child_collections = authorized_sub_collection_presenters
           @total_child_collections = total_authorized_sub_collections
@@ -42,10 +42,10 @@ module Hyku
           return nil if collection_presenter.nil?
           parent_collections = parent_collection_search_results
           puts "LOG_parent_collections" + parent_collections.inspect
-          @available_parent_collections = parent_collections
-          # @available_parent_collections = parent_collections.map do |col|
-          #   { "id" => col.id, "title_first" => col.title.first }
-          # end.to_json
+          #@parent_collections = parent_collections
+          @parent_collections = parent_collections.map do |col|
+            { "id" => col.id, "title_first" => col.title.first }
+          end.to_json
         end
 
         def total_authorized_parent_collections
