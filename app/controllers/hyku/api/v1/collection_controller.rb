@@ -52,7 +52,7 @@ module Hyku
 
         def total_authorized_parent_collections
           return 0 if collection_presenter.nil?
-          parent_collection_search_results.count
+          parent_collection_search_results.dig('response', 'docs').count
         end
 
         def parent_collection_search_results
