@@ -40,12 +40,13 @@ module Hyku
 
         def authorized_parent_collection_presenters
           return nil if collection_presenter.nil?
-          parent_collections = parent_collection_search_results
+          parent_collections_json_data = parent_collection_search_results
           puts "LOG_parent_collections" + parent_collections.inspect
-          @parent_collections = parent_collections
-          # @available_parent_collections = parent_collections.map do |col|
-          #   { "id" => col.id, "title_first" => col.title.first }
-          # end.to_json
+          # @parent_collections = parent_collections
+          docs = parent_collections_json_data.dig('response', 'docs')
+          docs.map do |doc|
+            { "id" => doc['id'], "title" => doc.dig('title_tesim', 0) }
+          end.to_json
         end
 
         def total_authorized_parent_collections
