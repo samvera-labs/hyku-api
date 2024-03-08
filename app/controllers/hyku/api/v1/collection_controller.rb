@@ -43,10 +43,11 @@ module Hyku
           parent_collections_json_data = parent_collection_search_results
           puts "LOG_parent_collections" + parent_collections_json_data.inspect
           # @parent_collections = parent_collections
-          docs = parent_collections_json_data.dig('response', 'docs')
-          docs.map do |doc|
+          document_list = parent_collections_json_data.dig('response', 'docs')
+          data = document_list.map do |doc|
             { "id" => doc['id'], "title" => doc.dig('title_tesim', 0) }
-          end.to_json
+          end
+          JSON.pretty_generate(data)
         end
 
         def total_authorized_parent_collections
