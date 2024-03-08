@@ -57,9 +57,9 @@ module Hyku
           parent_collection_search_results.count
         end
 
-        # def controller
-        #   self
-        # end
+        def controller
+          self
+        end
 
         def parent_collection_search_results
           puts "LOG_collection_presenter_solr_document - " + collection_presenter.solr_document.inspect
