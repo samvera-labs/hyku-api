@@ -58,9 +58,9 @@ module Hyku
         # end
 
         def parent_collection_search_results
-          puts "LOG_HYRAX_USE_SOLR_GRAPH_NESTING " + ENV['HYRAX_USE_SOLR_GRAPH_NESTING']
+          puts "LOG_collection_presenter_solr_document - " + collection_presenter.solr_document.inspect
           @parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
-                                                  .parent_collections(child: collection_presenter, scope: self, page: 1)
+                                                  .parent_collections(child: collection_presenter.solr_document, scope: self, page: 1)
 
           #@parent_collection_search_results ||= JSON.parse(available_parent_collections_data(collection: collection_presenter))
         end
