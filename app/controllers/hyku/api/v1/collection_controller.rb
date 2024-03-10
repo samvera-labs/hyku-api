@@ -75,10 +75,15 @@ module Hyku
           return nil if collection_presenter.nil? || collection_sub_collection_search_results.nil?
 
           sub_collection_documents = collection_sub_collection_search_results.documents
-          return 'No documents for processing' if sub_collection_documents.empty?
-          sub_collection_documents.map do |doc|
-            Hyrax::CollectionPresenter.new(doc, current_ability, request)
+          begin
+            sub_collection_documents.map do |doc|
+              Hyrax::CollectionPresenter.new(doc, current_ability, request)
+            end
+          rescue => e
+            logger.error("Failed to fetch sub collections. Error: #{e.message}")
+            return nil
           end
+
         end
 
         def total_authorized_sub_collections
