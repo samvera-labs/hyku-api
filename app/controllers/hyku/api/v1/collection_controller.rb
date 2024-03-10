@@ -40,32 +40,42 @@ module Hyku
 
         def authorized_parent_collection_presenters
           return nil if collection_presenter.nil?
-          parent_collections_json_data = parent_collection_search_results
-          puts "LOG_parent_collections" + parent_collections_json_data.inspect
-          # @parent_collections = parent_collections
-          document_list = parent_collections_json_data.dig('response', 'docs')
+          return nil if parent_collection_search_results.nil?
+
+          document_list = parent_collection_search_results.dig('response', 'docs')
+
+          return nil if document_list.nil?
           data = document_list.map { |doc| {
             "id" => doc['id'], "title" => doc.dig('title_tesim', 0) }
           }
-          JSON.parse(JSON.pretty_generate(data))
+          JSON.pretty_generate(data)
         end
 
         def total_authorized_parent_collections
           return 0 if collection_presenter.nil?
-          parent_collection_search_results.dig('response', 'docs').count
+          docs = parent_collection_search_results.dig('response', 'docs')
+
+          return 0 if docs.nil?
+
+          docs.count
         end
 
         def parent_collection_search_results
-          puts "LOG_collection_presenter_solr_document - " + collection_presenter.solr_document.inspect
-          @parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
-                                                  .parent_collections(child: collection_presenter.solr_document, scope: self, page: 1)
+          puts "LOG_parent_collection_page " + params[:parent_collection_page].to_i.inspect
+
+          begin
+            @parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
+                                                    .parent_collections(child: collection_presenter.solr_document, scope: self, page: 1)
+          rescue => e
+            logger.error("Failed to fetch parent collections. Error: #{e.message}")
+            return nil
+          end
         end
 
         #-------------------- Child collections ------------------------------------
         def authorized_sub_collection_presenters
           return nil if collection_presenter.nil?
           sub_collection_documents = collection_sub_collection_search_results.documents
-          puts "LOG_sub_collection_documents" + sub_collection_documents.inspect
           sub_collection_documents.map do |doc|
             Hyrax::CollectionPresenter.new(doc, current_ability, request)
           end
