@@ -36,6 +36,30 @@ module Hyku
 
         private
 
+        #-------------------- Work collections ------------------------------------
+        def authorized_work_presenters
+          return nil if collection_presenter.nil?
+          work_documents = collection_member_search_results.documents
+          work_documents.map do |doc|
+            presenter_class = work_presenter_class(doc)
+            presenter_class.new(doc, current_ability, request)
+          end
+        end
+
+        def total_authorized_works
+          return 0 if collection_presenter.nil?
+          collection_member_search_results.total
+        end
+
+        def collection_member_search_results
+          @collection_member_search_results ||=
+            if class_exists?('CollectionMemberSearchService')
+              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_works
+            else
+              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
+            end
+        end
+
         #-------------------- Parent collections ------------------------------------
 
         def authorized_parent_collection_presenters
@@ -97,30 +121,6 @@ module Hyku
               Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
             else
               Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_subcollections
-            end
-        end
-
-        #-------------------- Work collections ------------------------------------
-        def authorized_work_presenters
-          return nil if collection_presenter.nil?
-          work_documents = collection_member_search_results.documents
-          work_documents.map do |doc|
-            presenter_class = work_presenter_class(doc)
-            presenter_class.new(doc, current_ability, request)
-          end
-        end
-
-        def total_authorized_works
-          return 0 if collection_presenter.nil?
-          collection_member_search_results.total
-        end
-
-        def collection_member_search_results
-          @collection_member_search_results ||=
-            if class_exists?('CollectionMemberSearchService')
-              Hyrax::Collections::CollectionMemberSearchService.new(scope: self, collection: collection_presenter, params: params).available_member_works
-            else
-              Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
             end
         end
 
