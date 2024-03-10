@@ -48,7 +48,7 @@ module Hyku
           data = document_list.map { |doc| {
             "id" => doc['id'], "title" => doc.dig('title_tesim', 0) }
           }
-          JSON.pretty_generate(data)
+          JSON.parse(JSON.pretty_generate(data))
         end
 
         def total_authorized_parent_collections
@@ -62,10 +62,11 @@ module Hyku
 
         def parent_collection_search_results
           puts "LOG_parent_collection_page " + params[:parent_collection_page].to_i.inspect
+          page = params[:parent_collection_page].to_i
 
           begin
             @parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
-                                                    .parent_collections(child: collection_presenter.solr_document, scope: self, page: 1)
+                                                    .parent_collections(child: collection_presenter.solr_document, scope: self, page: page)
           rescue => e
             logger.error("Failed to fetch parent collections. Error: #{e.message}")
             return nil
