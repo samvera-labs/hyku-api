@@ -39,8 +39,7 @@ module Hyku
         #-------------------- Parent collections ------------------------------------
 
         def authorized_parent_collection_presenters
-          return nil if collection_presenter.nil?
-          return nil if parent_collection_search_results.nil?
+          return nil if collection_presenter.nil? || parent_collection_search_results.nil?
 
           document_list = parent_collection_search_results.dig('response', 'docs')
 
@@ -61,9 +60,7 @@ module Hyku
         end
 
         def parent_collection_search_results
-          puts "LOG_parent_collection_page " + params[:parent_collection_page].to_i.inspect
           page = params[:parent_collection_page].to_i
-
           begin
             @parent_collection_search_results ||= Hyrax::Collections::NestedCollectionQueryService
                                                     .parent_collections(child: collection_presenter.solr_document, scope: self, page: page)
@@ -75,8 +72,10 @@ module Hyku
 
         #-------------------- Child collections ------------------------------------
         def authorized_sub_collection_presenters
-          return nil if collection_presenter.nil?
+          return nil if collection_presenter.nil? || collection_sub_collection_search_results.nil?
+
           sub_collection_documents = collection_sub_collection_search_results.documents
+          return 'No documents for processing' if sub_collection_documents.empty?
           sub_collection_documents.map do |doc|
             Hyrax::CollectionPresenter.new(doc, current_ability, request)
           end
