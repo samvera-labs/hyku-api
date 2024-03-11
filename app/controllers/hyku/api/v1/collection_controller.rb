@@ -72,7 +72,7 @@ module Hyku
         end
 
         def total_authorized_parent_collections
-          return 0 if collection_presenter.nil?
+          return 0 if collection_presenter.nil? || parent_collection_search_results.nil? || parent_collection_search_results == [] || parent_collection_search_results.empty?
           docs = parent_collection_search_results.dig('response', 'docs')
 
           return 0 if docs.nil?
