@@ -60,8 +60,7 @@ module Hyku
         end
 
         def authorized_parent_collection_presenters
-          return nil if collection_presenter.nil? || parent_collection_search_results.nil?
-
+          return nil if collection_presenter.nil? || parent_collection_search_results.nil? || parent_collection_search_results == [] || parent_collection_search_results.empty?
           document_list = parent_collection_search_results.dig('response', 'docs')
 
           return nil if document_list.nil?
@@ -72,7 +71,7 @@ module Hyku
         end
 
         def total_authorized_parent_collections
-          return 0 if collection_presenter.nil?
+          return 0 if collection_presenter.nil? || parent_collection_search_results.nil? || parent_collection_search_results == [] || parent_collection_search_results.empty?
           docs = parent_collection_search_results.dig('response', 'docs')
 
           return 0 if docs.nil?
