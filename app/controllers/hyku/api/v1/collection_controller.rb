@@ -61,7 +61,6 @@ module Hyku
 
         def authorized_parent_collection_presenters
           return nil if collection_presenter.nil? || parent_collection_search_results.nil? || parent_collection_search_results == [] || parent_collection_search_results.empty?
-          puts "LOG_parent_collection_search_results " + parent_collection_search_results.inspect
           document_list = parent_collection_search_results.dig('response', 'docs')
 
           return nil if document_list.nil?
