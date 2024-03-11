@@ -36,7 +36,6 @@ module Hyku
 
         private
 
-        #-------------------- Work collections ------------------------------------
         def authorized_work_presenters
           return nil if collection_presenter.nil?
           work_documents = collection_member_search_results.documents
@@ -59,8 +58,6 @@ module Hyku
               Hyrax::Collections::CollectionMemberService.new(scope: self, collection: collection_presenter, params: params).available_member_works
             end
         end
-
-        #-------------------- Parent collections ------------------------------------
 
         def authorized_parent_collection_presenters
           return nil if collection_presenter.nil? || parent_collection_search_results.nil?
@@ -93,8 +90,6 @@ module Hyku
             return nil
           end
         end
-
-        #-------------------- Child collections ------------------------------------
         def authorized_sub_collection_presenters
           return nil if collection_presenter.nil? || collection_sub_collection_search_results.nil?
 
