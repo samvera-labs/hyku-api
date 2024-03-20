@@ -94,7 +94,7 @@ module Hyku
 
         def total_items
           return 0 if @work.nil?
-          item_member_search_results.total
+          item_member_search_results.count
         end
 
         def item_member_search_results
