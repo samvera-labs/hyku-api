@@ -92,12 +92,12 @@ module Hyku
         end
 
         def authorized_items
-          return nil if @work.nil?
+          return nil if item_member_search_results.nil?
           item_member_search_results
         end
 
         def total_items
-          return 0 if @work.nil?
+          return 0 if item_member_search_results.nil?
           item_member_search_results.count
         end
 
