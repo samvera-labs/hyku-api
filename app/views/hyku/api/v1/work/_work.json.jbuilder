@@ -34,11 +34,11 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "event_location" => nil,
   #                                         "event_title" => nil,
   # TODO: Put it back on
-  #json.files do
-  # json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document.private? }
-  # json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? }
-  # json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document.public? }
-  #end
+  json.files do
+  json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document.private? }
+  json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? }
+  json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document.public? }
+  end
   #                                         "funder" => nil,
   #                                         "funder_project_reference" => nil,
   #                                         "institution" => nil,
@@ -82,24 +82,24 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   json.source work.source
   json.subject work.subject
   # TODO: Put it back on
-  # if work.representative_presenter&.solr_document&.public?
-  #   json.representative_id work.representative_id
-  # else
-  #   json.representative_id nil
-  # end
-  # json.thumbnail_base64_string nil
+  if work.representative_presenter&.solr_document&.public?
+    json.representative_id work.representative_id
+  else
+    json.representative_id nil
+  end
+  json.thumbnail_base64_string nil
   # TODO: Put it back on
-  # if work.thumbnail_presenter&.solr_document&.public?
-  #   components = {
-  #     scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
-  #     host: @account.cname,
-  #     path: work.solr_document.thumbnail_path.split('?')[0],
-  #     query: work.solr_document.thumbnail_path.split('?')[1]
-  #   }
-  #   json.thumbnail_url URI::Generic.build(components).to_s
-  # else
-  #   json.thumbnail_url nil
-  # end
+  if work.thumbnail_presenter&.solr_document&.public?
+    components = {
+      scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
+      host: @account.cname,
+      path: work.solr_document.thumbnail_path.split('?')[0],
+      query: work.solr_document.thumbnail_path.split('?')[1]
+    }
+    json.thumbnail_url URI::Generic.build(components).to_s
+  else
+    json.thumbnail_url nil
+  end
   json.title work.title.first
   json.type "work"
   #                                         "version" => nil,
