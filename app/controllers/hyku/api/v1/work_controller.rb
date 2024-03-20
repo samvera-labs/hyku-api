@@ -33,6 +33,8 @@ module Hyku
           @collection_docs = repository.search(collection_search_builder).documents
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
+          @items = authorized_items
+          @total_items = total_items
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
@@ -49,41 +51,57 @@ module Hyku
 
         private
 
-          # Instantiates the search builder that builds a query for a single item
-          # this is useful in the show view.
-          def single_item_search_builder
-            Hyrax::WorkSearchBuilder.new(self).with(params.except(:q, :page))
+        # Instantiates the search builder that builds a query for a single item
+        # this is useful in the show view.
+        def single_item_search_builder
+          Hyrax::WorkSearchBuilder.new(self).with(params.except(:q, :page))
+        end
+
+        # Copied and modified from Hyrax WorksControllerBehavior
+        def iiif_manifest_builder
+          self.class.iiif_manifest_builder
+        end
+
+        def iiif_manifest_presenter
+          Hyrax::IiifManifestPresenter.new(@work).tap do |p|
+            p.hostname = request.hostname
+            p.ability = current_ability
           end
+        end
+        # End copy and modify
 
-          # Copied and modified from Hyrax WorksControllerBehavior
-          def iiif_manifest_builder
-            self.class.iiif_manifest_builder
-          end
+        def no_result_message
+          return "This tenant has no #{params[:type].pluralize}" if params[:type].present?
+          # return "There are no results for this query" if params[:availability].present?
 
-          def iiif_manifest_presenter
-            Hyrax::IiifManifestPresenter.new(@work).tap do |p|
-              p.hostname = request.hostname
-              p.ability = current_ability
-            end
-          end
-          # End copy and modify
+          metadata_params = params.except(:availability, :per_page, :page, :format, :controller, :action, :tenant_id).permit!
+          metadata_field, metadata_value = metadata_params.to_h.first
+          return "There are no results for this query" if metadata_value.present? && metadata_field.present?
 
-          def no_result_message
-            return "This tenant has no #{params[:type].pluralize}" if params[:type].present?
-            # return "There are no results for this query" if params[:availability].present?
+          # default message
+          "This tenant has no works"
+        end
 
-            metadata_params = params.except(:availability, :per_page, :page, :format, :controller, :action, :tenant_id).permit!
-            metadata_field, metadata_value = metadata_params.to_h.first
-            return "There are no results for this query" if metadata_value.present? && metadata_field.present?
+        def work_presenter_class(doc)
+          model_name = doc.to_model.model_name.name
+          "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
+        end
 
-            # default message
-            "This tenant has no works"
-          end
+        def authorized_items
+          return nil if @work.nil?
+          item_member_search_results
+        end
 
-          def work_presenter_class(doc)
-            model_name = doc.to_model.model_name.name
-            "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
-          end
+        def total_items
+          return 0 if @work.nil?
+          item_member_search_results.total
+        end
+
+        def item_member_search_results
+          array_of_ids = @work.list_of_item_ids_to_display
+          members = @work.member_presenters_for(array_of_ids)
+          @item_member_search_results ||= members
+        end
       end
     end
   end
