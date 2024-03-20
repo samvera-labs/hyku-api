@@ -26,7 +26,7 @@ module Hyku
         end
 
         def show
-          doc = repository.search(single_item_search_builder.query).documents.first
+          doc = work_document
           raise Blacklight::Exceptions::RecordNotFound unless doc.present?
 
           collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
@@ -87,6 +87,10 @@ module Hyku
           "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
         end
 
+        def work_document
+          @work_document ||= repository.search(single_item_search_builder.query).documents.first
+        end
+
         def authorized_items
           return nil if @work.nil?
           item_member_search_results
@@ -98,8 +102,14 @@ module Hyku
         end
 
         def item_member_search_results
-          array_of_ids = @work.list_of_item_ids_to_display
-          members = @work.member_presenters_for(array_of_ids)
+          # presenter_class = work_presenter_class(work_document)
+          doc = work_document
+          work = work_presenter_class(doc).new(doc, current_ability, request)
+
+          array_of_ids = work.list_of_item_ids_to_display
+          members = work.member_presenters_for(array_of_ids)
+          puts "LOG_members" + members.inspect
+          puts "LOG_array_of_ids" + array_of_ids.inspect
           @item_member_search_results ||= members
         end
       end
