@@ -81,11 +81,12 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "series_name" => nil,
   json.source work.source
   json.subject work.subject
-  if work.representative_presenter&.solr_document&.public?
-    json.representative_id work.representative_id
-  else
-    json.representative_id nil
-  end
+  # TODO: Put it back on
+  # if work.representative_presenter&.solr_document&.public?
+  #   json.representative_id work.representative_id
+  # else
+  #   json.representative_id nil
+  # end
   # json.thumbnail_base64_string nil
   if work.thumbnail_presenter&.solr_document&.public?
     components = {
