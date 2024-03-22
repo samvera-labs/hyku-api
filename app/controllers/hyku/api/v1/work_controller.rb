@@ -104,7 +104,7 @@ module Hyku
           def item_member_search_results
             # presenter_class = work_presenter_class(work_document)
             doc = repository.search(single_item_search_builder.query).documents.first
-            work_presenter = work_presenter_class(doc).new(doc, current_ability, request)
+            #work_presenter = work_presenter_class(doc).new(doc, current_ability, request)
 
             #array_of_ids = work_presenter.list_of_item_ids_to_display
             #members = work_presenter.member_presenters_for(array_of_ids)
