@@ -51,67 +51,67 @@ module Hyku
 
         private
 
-        # Instantiates the search builder that builds a query for a single item
-        # this is useful in the show view.
-        def single_item_search_builder
-          Hyrax::WorkSearchBuilder.new(self).with(params.except(:q, :page))
-        end
-
-        # Copied and modified from Hyrax WorksControllerBehavior
-        def iiif_manifest_builder
-          self.class.iiif_manifest_builder
-        end
-
-        def iiif_manifest_presenter
-          Hyrax::IiifManifestPresenter.new(@work).tap do |p|
-            p.hostname = request.hostname
-            p.ability = current_ability
+          # Instantiates the search builder that builds a query for a single item
+          # this is useful in the show view.
+          def single_item_search_builder
+            Hyrax::WorkSearchBuilder.new(self).with(params.except(:q, :page))
           end
-        end
-        # End copy and modify
 
-        def no_result_message
-          return "This tenant has no #{params[:type].pluralize}" if params[:type].present?
-          # return "There are no results for this query" if params[:availability].present?
+          # Copied and modified from Hyrax WorksControllerBehavior
+          def iiif_manifest_builder
+            self.class.iiif_manifest_builder
+          end
 
-          metadata_params = params.except(:availability, :per_page, :page, :format, :controller, :action, :tenant_id).permit!
-          metadata_field, metadata_value = metadata_params.to_h.first
-          return "There are no results for this query" if metadata_value.present? && metadata_field.present?
+          def iiif_manifest_presenter
+            Hyrax::IiifManifestPresenter.new(@work).tap do |p|
+              p.hostname = request.hostname
+              p.ability = current_ability
+            end
+          end
+          # End copy and modify
 
-          # default message
-          "This tenant has no works"
-        end
+          def no_result_message
+            return "This tenant has no #{params[:type].pluralize}" if params[:type].present?
+            # return "There are no results for this query" if params[:availability].present?
 
-        def work_presenter_class(doc)
-          model_name = doc.to_model.model_name.name
-          "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
-        end
+            metadata_params = params.except(:availability, :per_page, :page, :format, :controller, :action, :tenant_id).permit!
+            metadata_field, metadata_value = metadata_params.to_h.first
+            return "There are no results for this query" if metadata_value.present? && metadata_field.present?
 
-        def work_document
-          @work_document ||= repository.search(single_item_search_builder.query).documents.first
-        end
+            # default message
+            "This tenant has no works"
+          end
 
-        def authorized_items
-          return nil if item_member_search_results.nil?
-          item_member_search_results
-        end
+          def work_presenter_class(doc)
+            model_name = doc.to_model.model_name.name
+            "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
+          end
 
-        def total_items
-          return 0 if item_member_search_results.nil?
-          item_member_search_results.count
-        end
+          def work_document
+            @work_document ||= repository.search(single_item_search_builder.query).documents.first
+          end
 
-        def item_member_search_results
-          # presenter_class = work_presenter_class(work_document)
-          doc = work_document
-          work = work_presenter_class(doc).new(doc, current_ability, request)
+          def authorized_items
+            return nil if item_member_search_results.nil?
+            item_member_search_results
+          end
 
-          array_of_ids = work.list_of_item_ids_to_display
-          members = work.member_presenters_for(array_of_ids)
-          #puts "LOG_members" + members.inspect
-          #puts "LOG_array_of_ids" + array_of_ids.inspect
-          @item_member_search_results ||= members
-        end
+          def total_items
+            return 0 if item_member_search_results.nil?
+            item_member_search_results.count
+          end
+
+          def item_member_search_results
+            # presenter_class = work_presenter_class(work_document)
+            doc = work_document
+            work = work_presenter_class(doc).new(doc, current_ability, request)
+
+            array_of_ids = work.list_of_item_ids_to_display
+            members = work.member_presenters_for(array_of_ids)
+            #puts "LOG_members" + members.inspect
+            #puts "LOG_array_of_ids" + array_of_ids.inspect
+            @item_member_search_results ||= members
+          end
       end
     end
   end

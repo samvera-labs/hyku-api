@@ -35,9 +35,9 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "event_title" => nil,
   # TODO: Put it back on
   json.files do
-  json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document.private? }
-  json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? }
-  json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document.public? }
+    json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document.private? }
+    json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? }
+    json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document.public? }
   end
   #                                         "funder" => nil,
   #                                         "funder_project_reference" => nil,
