@@ -15,7 +15,7 @@ module Hyku
 
         def index
           super
-          raise Blacklight::Exceptions::RecordNotFound if ActiveFedora::Base.where("generic_type_sim:Work").exists?
+          raise Blacklight::Exceptions::RecordNotFound if ActiveFedora::Base.where("generic_type_sim:Work").count.zero?
 
           collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
           @collection_docs = repository.search(collection_search_builder).documents
