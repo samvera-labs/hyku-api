@@ -91,19 +91,19 @@ module Hyku
           #   @work_document ||= repository.search(single_item_search_builder.query).documents.first
           # end
 
-          def authorized_items
-            return nil if item_member_search_results.nil?
-            item_member_search_results
-          end
+          # def authorized_items
+          #   return nil if item_member_search_results.nil?
+          #   item_member_search_results
+          # end
 
-          def total_items
-            return 0 if item_member_search_results.nil?
-            item_member_search_results.count
-          end
+          # def total_items
+          #   return 0 if item_member_search_results.nil?
+          #   item_member_search_results.count
+          # end
 
           def item_member_search_results
             # presenter_class = work_presenter_class(work_document)
-            doc = work_document
+            doc = repository.search(single_item_search_builder.query).documents.first
             work_presenter = work_presenter_class(doc).new(doc, current_ability, request)
 
             array_of_ids = work_presenter.list_of_item_ids_to_display
