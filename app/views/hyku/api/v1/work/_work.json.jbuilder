@@ -33,7 +33,6 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "event_date" => nil,
   #                                         "event_location" => nil,
   #                                         "event_title" => nil,
-  # TODO: Put it back on
   json.files do
     json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document.private? }
     json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? }
@@ -81,14 +80,12 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "series_name" => nil,
   json.source work.source
   json.subject work.subject
-  # TODO: Put it back on
   if work.representative_presenter&.solr_document&.public?
     json.representative_id work.representative_id
   else
     json.representative_id nil
   end
   json.thumbnail_base64_string nil
-  # TODO: Put it back on
   if work.thumbnail_presenter&.solr_document&.public?
     components = {
       scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
@@ -111,7 +108,4 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   collection_presenters = work.member_of_collection_presenters.reject { |coll| coll.is_a? Hyrax::AdminSetPresenter }
   collections = collection_presenters.map { |collection| { uuid: collection.id, title: collection.title.first } }
   json.collections collections
-  #
-  # json.total_items @total_items
-  # json.items @items
 end
