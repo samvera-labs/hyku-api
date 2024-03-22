@@ -106,7 +106,7 @@ module Hyku
             doc = repository.search(single_item_search_builder.query).documents.first
             work_presenter = work_presenter_class(doc).new(doc, current_ability, request)
 
-            array_of_ids = work_presenter.list_of_item_ids_to_display
+            #array_of_ids = work_presenter.list_of_item_ids_to_display
             #members = work_presenter.member_presenters_for(array_of_ids)
             #puts "LOG_members" + members.inspect
             #puts "LOG_array_of_ids" + array_of_ids.inspect
