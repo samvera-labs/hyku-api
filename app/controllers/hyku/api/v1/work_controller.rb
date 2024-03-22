@@ -26,15 +26,15 @@ module Hyku
         end
 
         def show
-          doc = work_document
+          doc = repository.search(single_item_search_builder.query).documents.first
           raise Blacklight::Exceptions::RecordNotFound unless doc.present?
 
           collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
           @collection_docs = repository.search(collection_search_builder).documents
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
-          @items = authorized_items
-          @total_items = total_items
+          #@items = authorized_items
+          #@total_items = total_items
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
