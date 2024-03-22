@@ -33,8 +33,6 @@ module Hyku
           @collection_docs = repository.search(collection_search_builder).documents
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
-          #@items = authorized_items
-          #@total_items = total_items
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
