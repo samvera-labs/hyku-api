@@ -87,9 +87,9 @@ module Hyku
             "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
           end
 
-          def work_document
-            @work_document ||= repository.search(single_item_search_builder.query).documents.first
-          end
+          # def work_document
+          #   @work_document ||= repository.search(single_item_search_builder.query).documents.first
+          # end
 
           def authorized_items
             return nil if item_member_search_results.nil?
