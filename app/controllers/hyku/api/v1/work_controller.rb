@@ -101,9 +101,9 @@ module Hyku
           #   item_member_search_results.count
           # end
 
-          def item_member_search_results
+        #def item_member_search_results
             # presenter_class = work_presenter_class(work_document)
-            doc = repository.search(single_item_search_builder.query).documents.first
+            #doc = repository.search(single_item_search_builder.query).documents.first
             #work_presenter = work_presenter_class(doc).new(doc, current_ability, request)
 
             #array_of_ids = work_presenter.list_of_item_ids_to_display
@@ -111,7 +111,7 @@ module Hyku
             #puts "LOG_members" + members.inspect
             #puts "LOG_array_of_ids" + array_of_ids.inspect
             #@item_member_search_results ||= members
-          end
+        #end
       end
     end
   end
