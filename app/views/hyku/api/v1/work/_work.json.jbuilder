@@ -85,7 +85,7 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   else
     json.representative_id nil
   end
-  json.thumbnail_base64_string nil
+  # json.thumbnail_base64_string nil
   if work.thumbnail_presenter&.solr_document&.public?
     components = {
       scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
