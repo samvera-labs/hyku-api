@@ -84,22 +84,6 @@ module Hyku
             model_name = doc.to_model.model_name.name
             "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
           end
-
-          # def work_document
-          #   @work_document ||= repository.search(single_item_search_builder.query).documents.first
-          # end
-
-          # def authorized_items
-          #   return nil if item_member_search_results.nil?
-          #   item_member_search_results
-          # end
-
-          # def total_items
-          #   return 0 if item_member_search_results.nil?
-          #   item_member_search_results.count
-          # end
-
-
       end
     end
   end
