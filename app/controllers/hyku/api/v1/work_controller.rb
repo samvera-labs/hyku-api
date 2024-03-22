@@ -110,7 +110,7 @@ module Hyku
             members = work.member_presenters_for(array_of_ids)
             #puts "LOG_members" + members.inspect
             #puts "LOG_array_of_ids" + array_of_ids.inspect
-            @item_member_search_results ||= members
+            #@item_member_search_results ||= members
           end
       end
     end
