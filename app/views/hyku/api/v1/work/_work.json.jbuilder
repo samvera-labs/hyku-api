@@ -34,9 +34,15 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "event_location" => nil,
   #                                         "event_title" => nil,
   json.files do
-    json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document.private? }
-    json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? }
-    json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document.public? }
+    if work&.file_set_presenters
+      json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.private? }
+      json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.registered? }
+      json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.public? }
+    else
+      json.has_private_files false
+      json.has_registered_files false
+      json.has_public_files false
+    end
   end
   #                                         "funder" => nil,
   #                                         "funder_project_reference" => nil,
@@ -90,8 +96,8 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
     components = {
       scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
       host: @account.cname,
-      path: work.solr_document.thumbnail_path.split('?')[0],
-      query: work.solr_document.thumbnail_path.split('?')[1]
+      path: work.solr_document&.thumbnail_path.split('?')[0],
+      query: work.solr_document&.thumbnail_path.split('?')[1]
     }
     json.thumbnail_url URI::Generic.build(components).to_s
   else
@@ -100,10 +106,10 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   json.title work.title.first
   json.type "work"
   #                                         "version" => nil,
-  json.visibility work.solr_document.visibility
+  json.visibility work.solr_document&.visibility
   #                                         "volume" => nil,
   json.work_type work.model.model_name.to_s
-  json.workflow_status work.solr_document.workflow_state
+  json.workflow_status work.solr_document&.workflow_state
 
   collection_presenters = work.member_of_collection_presenters.reject { |coll| coll.is_a? Hyrax::AdminSetPresenter }
   collections = collection_presenters.map { |collection| { uuid: collection.id, title: collection.title.first } }
