@@ -35,9 +35,10 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "event_title" => nil,
   json.files do
     if work&.file_set_presenters
-      json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.private? }
-      json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.registered? }
-      json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.public? }
+      puts 'LOG_file_set_presenters ' + work.file_set_presenters.inspect
+      # json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.private? }
+      # json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.registered? }
+      # json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.public? }
     else
       json.has_private_files false
       json.has_registered_files false
