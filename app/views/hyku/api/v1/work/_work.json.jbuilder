@@ -36,9 +36,9 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   json.files do
     if work&.file_set_presenters
       puts 'LOG_file_set_presenters ' + work.file_set_presenters.inspect
-      # json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.private? }
-      # json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.registered? }
-      # json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document&.public? }
+      json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document=.private? }
+      json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document=.registered? }
+      json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document=.public? }
     else
       json.has_private_files false
       json.has_registered_files false
@@ -87,7 +87,7 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "series_name" => nil,
   json.source work.source
   json.subject work.subject
-  if work.representative_presenter&.solr_document&.public?
+  if work.representative_presenter&.solr_document=.public?
     json.representative_id work.representative_id
   else
     json.representative_id nil
