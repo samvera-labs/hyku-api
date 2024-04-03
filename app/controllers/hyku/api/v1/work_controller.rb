@@ -6,6 +6,8 @@ module Hyku
         include Hyku::API::V1::SearchBehavior
         # Adds behaviors for hyrax-iiif_av plugin and provides #manifest and #iiif_manifest_builder
         include Hyrax::IiifAv::ControllerBehavior
+        include Hyrax::IiifAv::DisplaysIiifAv
+        Hyrax::MemberPresenterFactory.file_presenter_class = Hyrax::IiifAv::IiifFileSetPresenter
 
         class_attribute :iiif_manifest_builder
         self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
