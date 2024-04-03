@@ -93,7 +93,7 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
     json.representative_id nil
   end
   # json.thumbnail_base64_string nil
-  if work.thumbnail_presenter&.solr_document&.public?
+  if work.thumbnail_presenter&.instance_variable_get('@solr_document')&.public?
     components = {
       scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
       host: @account.cname,
