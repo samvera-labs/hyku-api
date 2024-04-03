@@ -33,7 +33,6 @@ module Hyku
         end
 
         def show
-          puts 'LOG_presenter ' + presenter.inspect
           doc = repository.search(single_item_search_builder.query).documents.first
           raise Blacklight::Exceptions::RecordNotFound unless doc.present?
 
