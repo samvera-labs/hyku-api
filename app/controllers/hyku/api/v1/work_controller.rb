@@ -4,8 +4,13 @@ module Hyku
     module V1
       class WorkController < BaseController
         include Hyku::API::V1::SearchBehavior
+        include Blacklight::Base
+        include Blacklight::AccessControls::Catalog
 
-        class_attribute :iiif_manifest_builder
+        # Adds behaviors for hyrax-iiif_av plugin and provides #manifest and #iiif_manifest_builder
+        include Hyrax::IiifAv::ControllerBehavior
+
+        class_attribute :iiif_manifest_builder, :show_presenter
         self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
 
         # self.search_builder Hyrax::CollectionSearchBuilder
@@ -31,6 +36,7 @@ module Hyku
 
           collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
           @collection_docs = repository.search(collection_search_builder).documents
+          puts 'LOG_presenter ' + presenter.inspect
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
         rescue Blacklight::Exceptions::RecordNotFound
@@ -83,6 +89,17 @@ module Hyku
           def work_presenter_class(doc)
             model_name = doc.to_model.model_name.name
             "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
+          end
+
+          def presenter
+            @presenter ||= show_presenter.new(search_result_document(id: params[:id]), current_ability, request)
+          end
+
+          def parent_presenter
+            return @parent_presenter unless params[:parent_id]
+
+            @parent_presenter ||=
+              show_presenter.new(search_result_document(id: params[:parent_id]), current_ability, request)
           end
 
           # def work_document
