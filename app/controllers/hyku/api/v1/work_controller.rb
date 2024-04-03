@@ -4,13 +4,8 @@ module Hyku
     module V1
       class WorkController < BaseController
         include Hyku::API::V1::SearchBehavior
-        include Blacklight::Base
-        include Blacklight::AccessControls::Catalog
 
-        # Adds behaviors for hyrax-iiif_av plugin and provides #manifest and #iiif_manifest_builder
-        include Hyrax::IiifAv::ControllerBehavior
-
-        class_attribute :iiif_manifest_builder, :show_presenter
+        class_attribute :iiif_manifest_builder #, :show_presenter
         self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
 
         # self.search_builder Hyrax::CollectionSearchBuilder
@@ -54,6 +49,10 @@ module Hyku
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
 
+        def wrapper_for_solr_document
+          self.solr_document
+        end
+
         private
 
           # Instantiates the search builder that builds a query for a single item
@@ -92,16 +91,6 @@ module Hyku
             "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
           end
 
-          def presenter
-            @presenter ||= show_presenter.new(search_result_document(id: params[:id]), current_ability, request)
-          end
-
-          def parent_presenter
-            return @parent_presenter unless params[:parent_id]
-
-            @parent_presenter ||=
-              show_presenter.new(search_result_document(id: params[:parent_id]), current_ability, request)
-          end
 
           # def work_document
           #   @work_document ||= repository.search(single_item_search_builder.query).documents.first
