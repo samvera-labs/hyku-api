@@ -31,12 +31,13 @@ module Hyku
         end
 
         def show
+          puts 'LOG_presenter ' + presenter.inspect
           doc = repository.search(single_item_search_builder.query).documents.first
           raise Blacklight::Exceptions::RecordNotFound unless doc.present?
 
           collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
           @collection_docs = repository.search(collection_search_builder).documents
-          puts 'LOG_presenter ' + presenter.inspect
+
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
         rescue Blacklight::Exceptions::RecordNotFound
