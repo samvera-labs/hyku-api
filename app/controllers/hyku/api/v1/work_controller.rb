@@ -4,6 +4,8 @@ module Hyku
     module V1
       class WorkController < BaseController
         include Hyku::API::V1::SearchBehavior
+        include Hyrax::IiifAv::DisplaysIiifAv
+        Hyrax::MemberPresenterFactory.file_presenter_class = Hyrax::IiifAv::IiifFileSetPresenter
 
         class_attribute :iiif_manifest_builder #, :show_presenter
         self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
@@ -47,10 +49,6 @@ module Hyku
           render json: iiif_manifest_builder.manifest_for(presenter: iiif_manifest_presenter)
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
-        end
-
-        def wrapper_for_solr_document
-          self.solr_document
         end
 
         private
