@@ -115,4 +115,7 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   collection_presenters = work.member_of_collection_presenters.reject { |coll| coll.is_a? Hyrax::AdminSetPresenter }
   collections = collection_presenters.map { |collection| { uuid: collection.id, title: collection.title.first } }
   json.collections collections
+
+  json.total_items @total_items
+  json.items @items
 end

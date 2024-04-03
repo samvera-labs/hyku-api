@@ -41,6 +41,8 @@ module Hyku
 
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
+          @total_items = total_items
+          @items = authorized_items
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
@@ -100,31 +102,31 @@ module Hyku
           end
 
 
-          # def work_document
-          #   @work_document ||= repository.search(single_item_search_builder.query).documents.first
-          # end
+          def work_document
+            @work_document ||= repository.search(single_item_search_builder.query).documents.first
+          end
 
-          # def authorized_items
-          #   return nil if item_member_search_results.nil?
-          #   item_member_search_results
-          # end
+          def authorized_items
+            return nil if item_member_search_results.nil?
+            item_member_search_results
+          end
 
-          # def total_items
-          #   return 0 if item_member_search_results.nil?
-          #   item_member_search_results.count
-          # end
+          def total_items
+            return 0 if item_member_search_results.nil?
+            item_member_search_results.count
+          end
 
-        #def item_member_search_results
-            # presenter_class = work_presenter_class(work_document)
-            #doc = repository.search(single_item_search_builder.query).documents.first
-            #work_presenter = work_presenter_class(doc).new(doc, current_ability, request)
+        def item_member_search_results
+            presenter_class = work_presenter_class(work_document)
+            doc = repository.search(single_item_search_builder.query).documents.first
+            work_presenter = work_presenter_class(doc).new(doc, current_ability, request)
 
-            #array_of_ids = work_presenter.list_of_item_ids_to_display
-            #members = work_presenter.member_presenters_for(array_of_ids)
-            #puts "LOG_members" + members.inspect
-            #puts "LOG_array_of_ids" + array_of_ids.inspect
-            #@item_member_search_results ||= members
-        #end
+            array_of_ids = work_presenter.list_of_item_ids_to_display
+            members = work_presenter.member_presenters_for(array_of_ids)
+            puts "LOG_members" + members.inspect
+            puts "LOG_array_of_ids" + array_of_ids.inspect
+            @item_member_search_results ||= members
+        end
       end
     end
   end
