@@ -70,12 +70,18 @@ module Hyku
           end
 
           def iiif_manifest_presenter
-            Hyrax::IiifManifestPresenter.new(@work).tap do |p|
+            IiifManifestPresenter.new(search_result_document(id: params[:id])).tap do |p|
               p.hostname = request.hostname
               p.ability = current_ability
             end
           end
           # End copy and modify
+
+          def search_result_document(search_params)
+            _, document_list = search_results(search_params)
+            return document_list.first unless document_list.empty?
+            document_not_found!
+          end
 
           def no_result_message
             return "This tenant has no #{params[:type].pluralize}" if params[:type].present?
