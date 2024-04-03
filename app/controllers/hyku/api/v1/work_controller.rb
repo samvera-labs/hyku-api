@@ -4,10 +4,10 @@ module Hyku
     module V1
       class WorkController < BaseController
         include Hyku::API::V1::SearchBehavior
-        include Hyrax::IiifAv::DisplaysIiifAv
-        Hyrax::MemberPresenterFactory.file_presenter_class = Hyrax::IiifAv::IiifFileSetPresenter
+        # Adds behaviors for hyrax-iiif_av plugin and provides #manifest and #iiif_manifest_builder
+        include Hyrax::IiifAv::ControllerBehavior
 
-        class_attribute :iiif_manifest_builder #, :show_presenter
+        class_attribute :iiif_manifest_builder
         self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
 
         # self.search_builder Hyrax::CollectionSearchBuilder
