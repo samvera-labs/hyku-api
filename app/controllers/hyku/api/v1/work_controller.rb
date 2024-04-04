@@ -123,7 +123,7 @@ module Hyku
 
             array_of_ids = @work.list_of_item_ids_to_display
             puts "LOG_members" + array_of_ids.inspect
-            members = work_presenter.member_presenters_for(array_of_ids)
+            members = @work.member_presenters_for(array_of_ids)
             puts "LOG_array_of_ids" + members.inspect
             @item_member_search_results ||= members
         end
