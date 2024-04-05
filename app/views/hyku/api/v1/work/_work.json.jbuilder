@@ -117,6 +117,6 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   json.collections collections
 
   json.total_items @total_items
-  items_to_display = @items.map { |item| { uuid: item.id, title: item.title.first } }
+  items_to_display = @items.map { |item| { uuid: item.id, title: item.title.first, human_readable_type: item.human_readable_type } }
   json.items items_to_display
 end
