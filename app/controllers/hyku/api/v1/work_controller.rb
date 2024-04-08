@@ -137,7 +137,7 @@ module Hyku
         end
 
         def parent_search_results
-          parent = @work.parents
+          parent = @work.is_page_of
           @parent_search_results ||= parent
         end
       end
