@@ -108,6 +108,11 @@ module Hyku
             @work_document ||= repository.search(single_item_search_builder.query).documents.first
           end
 
+          def parent_work_ids
+            @parent_work_ids ||=
+              repository.search(single_item_search_builder.query).documents.first.parents.pluck(:id)
+          end
+
           def authorized_items
             return nil if item_member_search_results.nil?
             item_member_search_results
@@ -138,7 +143,7 @@ module Hyku
 
         def parent_search_results
           puts "LOG_@work" + @work.inspect
-          puts "LOG_@work_parent_id" + @work.parent_id.inspect
+          puts "LOG_parent_ids" + parent_work_ids.inspect
           parent = @work.is_page_of
           @parent_search_results ||= parent
         end
