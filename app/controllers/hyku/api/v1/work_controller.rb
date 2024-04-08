@@ -43,6 +43,8 @@ module Hyku
           @work = presenter_class.new(doc, current_ability, request)
           @total_items = total_items
           @items = authorized_items
+          @total_parents = total_parents
+          @parents = authorized_parents
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
@@ -117,15 +119,26 @@ module Hyku
           end
 
         def item_member_search_results
-            # presenter_class = work_presenter_class(work_document)
-            # doc = repository.search(single_item_search_builder.query).documents.first
-            # work_presenter = work_presenter_class(doc).new(doc, current_ability, request)
-
             array_of_ids = @work.list_of_item_ids_to_display
             puts "LOG_array_of_ids" + array_of_ids.inspect
             members = @work.member_presenters_for(array_of_ids)
             puts "LOG_members" + members.inspect
             @item_member_search_results ||= members
+        end
+
+        def authorized_parents
+          return nil if parent_search_results.nil?
+          parent_search_results
+        end
+
+        def total_parents
+          return 0 if parent_search_results.nil?
+          parent_search_results.count
+        end
+
+        def parent_search_results
+          parent = @work.parents
+          @parent_search_results ||= parent
         end
       end
     end

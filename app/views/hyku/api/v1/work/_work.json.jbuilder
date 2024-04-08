@@ -116,6 +116,10 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   collections = collection_presenters.map { |collection| { uuid: collection.id, title: collection.title.first } }
   json.collections collections
 
+  json.total_parents @total_parents
+  parents_to_display = @parents.map { |parent| { uuid: parent.id, title: parent.title.first, human_readable_type: parent.human_readable_type } }
+  json.parents parents_to_display
+
   json.total_items @total_items
   items_to_display = @items.map { |item| { uuid: item.id, title: item.title.first, human_readable_type: item.human_readable_type } }
   json.items items_to_display
