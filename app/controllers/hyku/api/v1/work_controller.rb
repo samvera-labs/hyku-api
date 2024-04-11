@@ -108,7 +108,7 @@ module Hyku
             @work_document ||= repository.search(single_item_search_builder.query).documents.first
           end
 
-        def self.parent_for(work)
+        def parent_for(work)
           # fallback to Fedora-stored relationships if work's aggregation of
           #   file set is not indexed in Solr
           work.parent || work.member_of.find(&:work?)
