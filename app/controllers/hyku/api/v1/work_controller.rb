@@ -111,7 +111,7 @@ module Hyku
         def parent_for(work)
           # fallback to Fedora-stored relationships if work's aggregation of
           #   file set is not indexed in Solr
-          work.parent || work.member_of.find(&:work?)
+          work.member_of.find(&:work?)
         end
 
           def authorized_items
