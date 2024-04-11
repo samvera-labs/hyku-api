@@ -143,8 +143,8 @@ module Hyku
         end
 
         def parent_search_results
-          puts "LOG_@work" + @work.inspect
-          parent_of_work = parent_for(@work)
+          puts "LOG_@work" + @work.solr_document.inspect
+          parent_of_work = parent_for(@work.solr_document)
           puts "LOG_parent_for" + parent_of_work.inspect
           parent = @work.is_page_of
           @parent_search_results ||= parent
