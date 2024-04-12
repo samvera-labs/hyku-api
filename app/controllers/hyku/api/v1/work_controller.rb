@@ -146,7 +146,7 @@ module Hyku
           puts "LOG_@work" + @work.solr_document.inspect
           item_members = item_member_search_results
           puts "LOG_item_member_search_results" + item_members.inspect
-          parent_of_work = item_members.is_page_of
+          parent_of_work = item_members.pluck(:id)
           puts "LOG_parents" + parent_of_work.inspect
           parent = @work.is_page_of
           @parent_search_results ||= parent
