@@ -115,13 +115,13 @@ module Hyku
         end
 
           def authorized_items
-            return nil if item_member_search_results.nil?
-            item_member_search_results
+            return nil if parent_search_results.nil?
+            parent_search_results
           end
 
           def total_items
-            return 0 if item_member_search_results.nil?
-            item_member_search_results.count
+            return 0 if parent_search_results.nil?
+            parent_search_results.count
           end
 
         def authorized_parents
