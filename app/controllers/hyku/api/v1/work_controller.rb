@@ -124,14 +124,6 @@ module Hyku
             item_member_search_results.count
           end
 
-        def item_member_search_results
-            array_of_ids = @work.list_of_item_ids_to_display
-            puts "LOG_array_of_ids" + array_of_ids.inspect
-            members = @work.member_presenters_for(array_of_ids)
-            puts "LOG_members" + members.inspect
-            @item_member_search_results ||= members
-        end
-
         def authorized_parents
           return nil if parent_search_results.nil?
           parent_search_results
@@ -143,13 +135,10 @@ module Hyku
         end
 
         def parent_search_results
-          puts "LOG_@work" + @work.solr_document.inspect
-          item_members = item_member_search_results
-          puts "LOG_item_member_search_results" + item_members.inspect
-          parent_of_work = item_members.pluck(:id)
-          puts "LOG_parents" + parent_of_work.inspect
-          parent = @work.is_page_of
-          @parent_search_results ||= parent
+          puts "LOG_@work" + @work.inspect
+          parent_works = @work.parent_works(current_user)
+          puts "LOG_parent_works" + parent_works.inspect
+          @parent_search_results ||= parent_works
         end
       end
     end
