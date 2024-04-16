@@ -7,11 +7,6 @@ module Hyku
     module V1
       class WorkController < BaseController
         include Hyku::API::V1::SearchBehavior
-        # Adds behaviors for hyrax-iiif_av plugin and provides #manifest and #iiif_manifest_builder
-        include Hyrax::IiifAv::ControllerBehavior
-        include Hyrax::IiifAv::DisplaysIiifAv
-        Hyrax::MemberPresenterFactory.file_presenter_class = Hyrax::IiifAv::IiifFileSetPresenter
-
         class_attribute :iiif_manifest_builder
         self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
 
@@ -73,18 +68,12 @@ module Hyku
           end
 
           def iiif_manifest_presenter
-            IiifManifestPresenter.new(search_result_document(id: params[:id])).tap do |p|
+            Hyrax::IiifManifestPresenter.new(@work).tap do |p|
               p.hostname = request.hostname
               p.ability = current_ability
             end
           end
           # End copy and modify
-
-          def search_result_document(search_params)
-            _, document_list = search_results(search_params)
-            return document_list.first unless document_list.empty?
-            document_not_found!
-          end
 
           def no_result_message
             return "This tenant has no #{params[:type].pluralize}" if params[:type].present?
@@ -103,16 +92,9 @@ module Hyku
             "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
           end
 
-
-          def work_document
-            @work_document ||= repository.search(single_item_search_builder.query).documents.first
+          def parent_for(work)
+            work.member_of.find(&:work?)
           end
-
-        def parent_for(work)
-          # fallback to Fedora-stored relationships if work's aggregation of
-          #   file set is not indexed in Solr
-          work.member_of.find(&:work?)
-        end
 
           def authorized_items
             return nil if parent_search_results.nil?
@@ -124,22 +106,19 @@ module Hyku
             parent_search_results.count
           end
 
-        def authorized_parents
-          return nil if parent_search_results.nil?
-          parent_search_results
-        end
+          def authorized_parents
+            return nil if parent_search_results.nil?
+            parent_search_results
+          end
 
-        def total_parents
-          return 0 if parent_search_results.nil?
-          parent_search_results.count
-        end
+          def total_parents
+            return 0 if parent_search_results.nil?
+            parent_search_results.count
+          end
 
-        def parent_search_results
-          puts "LOG_@work" + @work.inspect
-          parent_works = @work.parent_works(current_user)
-          puts "LOG_parent_works" + parent_works.inspect
-          @parent_search_results ||= parent_works
-        end
+          def parent_search_results
+            @work.parent_works(current_user)
+          end
       end
     end
   end
