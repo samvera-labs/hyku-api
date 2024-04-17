@@ -4,20 +4,20 @@ module Hyku
     module V1
       class WorkController < BaseController
         include Hyku::API::V1::SearchBehavior
-
         class_attribute :iiif_manifest_builder
-        self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ?
-                                        Hyrax::CachingIiifManifestBuilder.new :
-                                        Hyrax::ManifestBuilderService.new)
+        self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
 
+        # self.search_builder Hyrax::CollectionSearchBuilder
         configure_blacklight do |config|
           config.search_builder_class = Hyku::API::WorksSearchBuilder
         end
 
         def index
           super
-          raise Blacklight::Exceptions::RecordNotFound if no_works_present?
-          perform_collection_search
+          raise Blacklight::Exceptions::RecordNotFound if ActiveFedora::Base.where("generic_type_sim:Work").count.zero?
+
+          collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
+          @collection_docs = repository.search(collection_search_builder).documents
           @works = @document_list.map { |doc| Hyku::WorkShowPresenter.new(doc, current_ability, request) }
           @work_count = @response['response']['numFound']
         rescue Blacklight::Exceptions::RecordNotFound
@@ -27,42 +27,17 @@ module Hyku
         def show
           doc = repository.search(single_item_search_builder.query).documents.first
           raise Blacklight::Exceptions::RecordNotFound unless doc.present?
-          perform_collection_search
-          instantiate_vars_for_work_info(doc)
-        rescue Blacklight::Exceptions::RecordNotFound
-          render_no_record_error
-        end
 
-        def manifest
-          @work = repository.search(single_item_search_builder.query).documents.first
-          raise Blacklight::Exceptions::RecordNotFound unless @work.present?
-          headers['Access-Control-Allow-Origin'] = '*'
-          render json: iiif_manifest_builder.manifest_for(presenter: iiif_manifest_presenter)
-        rescue Blacklight::Exceptions::RecordNotFound
-          render_no_record_error
-        end
-
-        private
-
-        def no_works_present?
-          ActiveFedora::Base.where("generic_type_sim:Work").count.zero?
-        end
-
-        def perform_collection_search
           collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
           @collection_docs = repository.search(collection_search_builder).documents
-        end
 
-        def instantiate_vars_for_work_info(doc)
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
           @total_items = total_items
           @items = authorized_items
           @total_parents = total_parents
           @parents = authorized_parents
-        end
-
-        def render_no_record_error
+        rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
 
