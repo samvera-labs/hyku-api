@@ -34,15 +34,9 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "event_location" => nil,
   #                                         "event_title" => nil,
   json.files do
-    if work&.file_set_presenters
-      json.has_private_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').private? }
-      json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').registered? }
-      json.has_public_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').public? }
-    else
-      json.has_private_files false
-      json.has_registered_files false
-      json.has_public_files false
-    end
+    json.has_private_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').private? }
+    json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').registered? }
+    json.has_public_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').public? }
   end
   #                                         "funder" => nil,
   #                                         "funder_project_reference" => nil,
