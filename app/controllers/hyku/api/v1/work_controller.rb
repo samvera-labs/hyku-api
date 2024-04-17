@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'iiif_manifest'
-
 module Hyku
   module API
     module V1
@@ -92,18 +90,20 @@ module Hyku
             "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
           end
 
-          def parent_for(work)
-            work.member_of.find(&:work?)
-          end
-
           def authorized_items
-            return nil if parent_search_results.nil?
-            parent_search_results
+            return nil if item_member_search_results.nil?
+            item_member_search_results
           end
 
           def total_items
-            return 0 if parent_search_results.nil?
-            parent_search_results.count
+            return 0 if item_member_search_results.nil?
+            item_member_search_results.count
+          end
+
+          def item_member_search_results
+              array_of_ids = @work.list_of_item_ids_to_display
+              members = @work.member_presenters_for(array_of_ids)
+              @item_member_search_results ||= members
           end
 
           def authorized_parents
