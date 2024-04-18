@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module Hyku
+module  Hyku
   module API
     class Engine < ::Rails::Engine
       isolate_namespace Hyku::API
