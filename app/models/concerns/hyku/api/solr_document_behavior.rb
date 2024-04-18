@@ -8,7 +8,8 @@ module Hyku
       end
 
       def query(query, **opts)
-        result = Hyrax::SolrService.post(query, **opts)
+        service_class = defined?(Hyrax::SolrService) ? Hyrax::SolrService : ActiveFedora::SolrService
+        result = service_class.post(query, **opts)
         result.fetch('response').fetch('docs', [])
       end
     end
