@@ -14,6 +14,7 @@ module Hyku
 
       def self.dynamically_include_mixins
         Hyrax::WorkShowPresenter.include Hyku::API::WorkShowPresenterBehavior
+        SolrDocument.include Hyku::API::SolrDocumentBehavior
       end
 
       if Rails.env.development?

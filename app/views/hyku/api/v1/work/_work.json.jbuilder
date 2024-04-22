@@ -34,9 +34,9 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "event_location" => nil,
   #                                         "event_title" => nil,
   json.files do
-    json.has_private_files work.file_set_presenters.any? { |fsp| fsp.solr_document.private? }
-    json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.solr_document.registered? }
-    json.has_public_files work.file_set_presenters.any? { |fsp| fsp.solr_document.public? }
+    json.has_private_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').private? }
+    json.has_registered_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').registered? }
+    json.has_public_files work.file_set_presenters.any? { |fsp| fsp.instance_variable_get('@solr_document').public? }
   end
   #                                         "funder" => nil,
   #                                         "funder_project_reference" => nil,
@@ -80,13 +80,13 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   #                                         "series_name" => nil,
   json.source work.source
   json.subject work.subject
-  if work.representative_presenter&.solr_document&.public?
+  if work.representative_presenter&.instance_variable_get('@solr_document').public?
     json.representative_id work.representative_id
   else
     json.representative_id nil
   end
   # json.thumbnail_base64_string nil
-  if work.thumbnail_presenter&.solr_document&.public?
+  if work.thumbnail_presenter&.instance_variable_get('@solr_document')&.public?
     components = {
       scheme: Rails.application.routes.default_url_options.fetch(:protocol, 'http'),
       host: @account.cname,
@@ -108,4 +108,12 @@ json.cache! [@account, :works, work.id, work.solr_document[:_version_],
   collection_presenters = work.member_of_collection_presenters.reject { |coll| coll.is_a? Hyrax::AdminSetPresenter }
   collections = collection_presenters.map { |collection| { uuid: collection.id, title: collection.title.first } }
   json.collections collections
+
+  json.total_parents @total_parents
+  parents_to_display = @parents.map { |parent| { uuid: parent.id, title: parent.title.first, human_readable_type: parent.human_readable_type } }
+  json.parent_works parents_to_display
+
+  json.total_items @total_items
+  items_to_display = @items.map { |item| { uuid: item.id, title: item.title.first, human_readable_type: item.human_readable_type } }
+  json.items items_to_display
 end

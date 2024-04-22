@@ -4,7 +4,6 @@ module Hyku
     module V1
       class WorkController < BaseController
         include Hyku::API::V1::SearchBehavior
-
         class_attribute :iiif_manifest_builder
         self.iiif_manifest_builder = (Flipflop.cache_work_iiif_manifest? ? Hyrax::CachingIiifManifestBuilder.new : Hyrax::ManifestBuilderService.new)
 
@@ -31,8 +30,13 @@ module Hyku
 
           collection_search_builder = Hyrax::CollectionSearchBuilder.new(self).with_access(:read).rows(1_000_000)
           @collection_docs = repository.search(collection_search_builder).documents
+
           presenter_class = work_presenter_class(doc)
           @work = presenter_class.new(doc, current_ability, request)
+          @total_items = total_items
+          @items = authorized_items
+          @total_parents = total_parents
+          @parents = authorized_parents
         rescue Blacklight::Exceptions::RecordNotFound
           render json: { status: 404, code: 'not_found', message: "This is either a private work or there is no record with id: #{params[:id]}" }
         end
@@ -83,6 +87,36 @@ module Hyku
           def work_presenter_class(doc)
             model_name = doc.to_model.model_name.name
             "Hyrax::#{model_name}Presenter".safe_constantize || Hyku::WorkShowPresenter
+          end
+
+          def authorized_items
+            return nil if item_member_search_results.nil?
+            item_member_search_results
+          end
+
+          def total_items
+            return 0 if item_member_search_results.nil?
+            item_member_search_results.count
+          end
+
+          def item_member_search_results
+              array_of_ids = @work.list_of_item_ids_to_display
+              members = @work.member_presenters_for(array_of_ids)
+              @item_member_search_results ||= members
+          end
+
+          def authorized_parents
+            return nil if parent_search_results.nil?
+            parent_search_results
+          end
+
+          def total_parents
+            return 0 if parent_search_results.nil?
+            parent_search_results.count
+          end
+
+          def parent_search_results
+            @work.parent_works(current_user)
           end
       end
     end
