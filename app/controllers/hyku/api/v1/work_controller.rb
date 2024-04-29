@@ -100,9 +100,13 @@ module Hyku
           end
 
           def item_member_search_results
+            presenter_class = work_presenter_class(@work)
+            puts "LOG_presenter_class" + presenter_class.inspect
+            if presenter_class && @work.is_a?(presenter_class)
               array_of_ids = @work.list_of_item_ids_to_display
               members = @work.member_presenters_for(array_of_ids)
               @item_member_search_results ||= members
+            end
           end
 
           def authorized_parents
